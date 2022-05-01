@@ -1,0 +1,58 @@
+package server
+
+import (
+	"News24/internal/app/auth"
+	endPoints "News24/internal/app/auth/delivery/http"
+	"News24/internal/app/auth/repository/postgres"
+	"News24/internal/app/auth/usecase"
+	"News24/internal/models"
+
+	"fmt"
+	"github.com/gin-gonic/gin"
+	"log"
+	"net/http"
+	"time"
+)
+
+type App struct {
+	httpServer  *http.Server
+	config      *models.Config
+	authUseCase auth.UseCase
+}
+
+func NewApp(config *models.Config) (app *App) {
+	db, err := initDB(config)
+	if err != nil {
+		log.Fatalf("Error: %v", err)
+	}
+
+	authService := usecase.NewAuthUseCase(db, fmt.Sprintf("%v", config.HASH_SALT), time.Duration(5))
+
+	app = &App{
+		authUseCase: authService,
+		config:      config}
+
+	return app
+}
+
+func (a *App) Run() {
+	router := gin.Default()
+
+	endPoints.RegisterHTTPEndpoints(router, a.authUseCase)
+
+	router.Run(fmt.Sprintf("%v", a.config.ADDR_AUTH))
+}
+
+func initDB(config *models.Config) (db *postgres.UserRepository, err error) {
+	psqlconn := fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=disable",
+		config.POSTGRES_HOST,
+		config.POSTGRES_PORT,
+		config.POSTGRES_USER,
+		config.POSTGRES_PASSWORD,
+		config.POSTGRES_BD_NAME)
+
+	db = &postgres.UserRepository{}
+	err = db.NewUserRepository(psqlconn, fmt.Sprintf("%v", config.POSTGRES_TABLE_USERS))
+
+	return db, err
+}
