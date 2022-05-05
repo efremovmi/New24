@@ -4,7 +4,6 @@ import (
 	errorsCustom "News24/internal/app/control_users"
 	"News24/internal/models"
 
-	"context"
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
@@ -38,7 +37,7 @@ func (r *UserRepository) NewUserRepository(psqlconn, tableName string) (err erro
 	return nil
 }
 
-func (r *UserRepository) CreateUser(ctx context.Context, user *models.User) (err error) {
+func (r *UserRepository) CreateUser(user *models.User) (err error) {
 	db, err := sql.Open("postgres", r.psqlconn)
 	if err != nil {
 		return errorsCustom.IncorrectParamsConnectBD
@@ -62,7 +61,7 @@ func (r *UserRepository) CreateUser(ctx context.Context, user *models.User) (err
 	return nil
 }
 
-func (r *UserRepository) GetUserForLogin(ctx context.Context, username string) (user *models.User, err error) {
+func (r *UserRepository) GetUserForLogin(username string) (user *models.User, err error) {
 	db, err := sql.Open("postgres", r.psqlconn)
 	if err != nil {
 		return user, errorsCustom.IncorrectParamsConnectBD
@@ -91,7 +90,7 @@ func (r *UserRepository) GetUserForLogin(ctx context.Context, username string) (
 	return user, nil
 }
 
-func (r *UserRepository) GetAllUsers(ctx context.Context) (userList []*models.User, err error) {
+func (r *UserRepository) GetAllUsers() (userList []*models.User, err error) {
 	db, err := sql.Open("postgres", r.psqlconn)
 	userList = make([]*models.User, 0)
 
@@ -109,7 +108,7 @@ func (r *UserRepository) GetAllUsers(ctx context.Context) (userList []*models.Us
 		var role64 int64
 		err = rows.Scan(&user.ID, &user.UserName, &role64)
 		if err != nil {
-			return nil, errorsCustom.BadGetAllUsers
+			return make([]*models.User, 0), errorsCustom.BadGetAllUsers
 		}
 		user.Role = int(role64)
 		user.Password = ""
@@ -119,7 +118,7 @@ func (r *UserRepository) GetAllUsers(ctx context.Context) (userList []*models.Us
 	return userList, nil
 }
 
-func (r *UserRepository) UpdateUserRoleForLogin(ctx context.Context, username string, role int) (err error) {
+func (r *UserRepository) UpdateUserRoleForLogin(username string, role int) (err error) {
 	db, err := sql.Open("postgres", r.psqlconn)
 	if err != nil {
 		return errorsCustom.IncorrectParamsConnectBD
@@ -138,7 +137,7 @@ func (r *UserRepository) UpdateUserRoleForLogin(ctx context.Context, username st
 	return nil
 }
 
-func (r *UserRepository) DeleteUserForLogin(ctx context.Context, username string) (err error) {
+func (r *UserRepository) DeleteUserForLogin(username string) (err error) {
 	db, err := sql.Open("postgres", r.psqlconn)
 	if err != nil {
 		return errorsCustom.IncorrectParamsConnectBD

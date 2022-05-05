@@ -5,7 +5,6 @@ import (
 	"News24/internal/common/helpers_function"
 	"News24/internal/models"
 
-	"context"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"log"
@@ -34,7 +33,7 @@ func TestCreateUser(t *testing.T) {
 		log.Fatalf("Error: %v", err)
 	}
 
-	err = repo.CreateUser(context.Background(),
+	err = repo.CreateUser(
 		&models.User{
 			UserName: "test",
 			Password: "test",
@@ -65,7 +64,7 @@ func TestGetUserForLogin(t *testing.T) {
 		log.Fatalf("Error: %v", err)
 	}
 
-	err = repo.CreateUser(context.Background(), &models.User{UserName: "test", Password: "test", Role: 0})
+	err = repo.CreateUser(&models.User{UserName: "test", Password: "test", Role: 0})
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 	}
@@ -91,7 +90,7 @@ func TestGetUserForLogin(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			user, err := repo.GetUserForLogin(context.Background(), tc.payload["username"])
+			user, err := repo.GetUserForLogin(tc.payload["username"])
 			if tc.expectedError != nil {
 				assert.Equal(t, errorsCustom.UserNotFound, err)
 			} else {
@@ -123,7 +122,7 @@ func TestUpdateUserRoleForLogin(t *testing.T) {
 		log.Fatalf("Error: %v", err)
 	}
 
-	err = repo.CreateUser(context.Background(), &models.User{UserName: "test", Password: "test", Role: 0})
+	err = repo.CreateUser(&models.User{UserName: "test", Password: "test", Role: 0})
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 	}
@@ -151,7 +150,6 @@ func TestUpdateUserRoleForLogin(t *testing.T) {
 			assert.Equal(t, nil, err)
 
 			err = repo.UpdateUserRoleForLogin(
-				context.Background(),
 				fmt.Sprintf("%v", tc.payload.UserName),
 				role)
 
@@ -228,7 +226,6 @@ func TestGetAllUsers(t *testing.T) {
 
 			if tc.isAddNow {
 				err = repo.CreateUser(
-					context.Background(),
 					&models.User{
 						UserName: fmt.Sprintf("%s_%d", "test", i),
 						Password: "test",
@@ -237,7 +234,7 @@ func TestGetAllUsers(t *testing.T) {
 				assert.Equal(t, nil, err)
 			}
 
-			actualUserList, err := repo.GetAllUsers(context.Background())
+			actualUserList, err := repo.GetAllUsers()
 
 			assert.Equal(t, len(tc.expectedUserList), len(actualUserList))
 			minLen := len(tc.expectedUserList)
@@ -277,12 +274,12 @@ func TestDeleteUserForLogin(t *testing.T) {
 		log.Fatalf("Error: %v", err)
 	}
 
-	err = repo.CreateUser(context.Background(), &models.User{UserName: "test", Password: "test", Role: 0})
+	err = repo.CreateUser(&models.User{UserName: "test", Password: "test", Role: 0})
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 	}
 
-	err = repo.CreateUser(context.Background(), &models.User{UserName: "test1", Password: "test1", Role: 1})
+	err = repo.CreateUser(&models.User{UserName: "test1", Password: "test1", Role: 1})
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 	}
@@ -316,12 +313,11 @@ func TestDeleteUserForLogin(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 
 			err = repo.DeleteUserForLogin(
-				context.Background(),
 				fmt.Sprintf("%v", tc.payload.UserName),
 			)
 			assert.Equal(t, tc.expectedError, err)
 
-			userList, err := repo.GetAllUsers(context.Background())
+			userList, err := repo.GetAllUsers()
 			assert.Equal(t, nil, err)
 			assert.Equal(t, tc.expectedCountUsers, len(userList))
 		})

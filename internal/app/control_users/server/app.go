@@ -39,7 +39,7 @@ func (a *App) Run() {
 
 	endPoints.RegisterHTTPEndpoints(router, a.ctrlUsersUseCase)
 
-	router.Run(fmt.Sprintf("%v", a.config.ADDR_CONTROL_USERS))
+	router.Run(fmt.Sprintf("%v", a.config.ADR_CONTROL_USERS))
 }
 
 func initDB(config *models.Config) (db *postgres.UserRepository, err error) {

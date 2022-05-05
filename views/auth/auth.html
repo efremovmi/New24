@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Auth</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- <link rel="icon" type="image/png" href="images/icons/favicon.ico" /> -->
+
+
+
+  <link rel="stylesheet" type="text/css" href="./auth/static/css/style.css">
+
+
+</head>
+<body>
+  <div class="message"></div>
+  <form action="" method="post" onsubmit="" id="form">
+    <input checked="" id="signin" name="action" type="radio" value="signin">
+    <label for="signin">Войти</label>
+    <input id="signup" name="action" type="radio" value="signup">
+    <label for="signup">Зарегистрироваться</label>
+    <div id="wrapper">
+      <div id="arrow"></div>
+      <input id="email" placeholder="Логин" type="text">
+      <input id="pass" placeholder="Пароль" type="password">
+      <input id="repass" placeholder="Повторите пароль" type="password">
+    </div>
+    <button type="submit">
+      <span>
+        <br>
+        Войти
+        <br>
+        Зарегистрироваться
+      </span>
+    </button>
+  </form>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.26.1/axios.min.js" integrity="sha512-bPh3uwgU5qEMipS/VOmRqynnMXGGSRv+72H/N260MQeXZIK4PG48401Bsby9Nq5P5fz7hy5UGNmC/W1Z51h2GQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script src="./auth/static/js/auth.js"></script>
+
+
+</body>
+</html>

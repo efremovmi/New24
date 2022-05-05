@@ -13,7 +13,6 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 		err := helpers.VerifyToken(c)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, models.StandardResponses{
-				Ok:  "false",
 				Err: err.Error()})
 			c.Abort()
 			return

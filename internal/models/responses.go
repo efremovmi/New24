@@ -1,24 +1,23 @@
 package models
 
 type StandardResponses struct {
-	Ok  string
-	Err string
+	Status string `json:"status,omitempty"`
+	Err    string `json:"err,omitempty"`
 }
 
 type AuthResponses struct {
-	Ok    string
-	Err   string
-	Token string
+	Err   string `json:"err,omitempty"`
+	Token string `json:"token,omitempty"`
 }
 
 type GetAllUsersResponses struct {
-	Ok    string
-	Err   string
-	Users []*User
+	Status string  `json:"status,omitempty"`
+	Err    string  `json:"err,omitempty"`
+	Users  []*User `json:"users,omitempty"`
 }
 
 type GetUserResponses struct {
-	Ok   string
-	Err  string
-	User *User
+	Status string `json:"status,omitempty"`
+	Err    string `json:"err,omitempty"`
+	User   *User  `json:"user,omitempty"`
 }

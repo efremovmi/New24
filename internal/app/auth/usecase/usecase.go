@@ -6,7 +6,6 @@ import (
 	"News24/internal/common/helpers_function"
 	"News24/internal/models"
 
-	"context"
 	"crypto/sha1"
 	"encoding/hex"
 	"time"
@@ -30,38 +29,23 @@ func NewAuthUseCase(
 	}
 }
 
-func (a *AuthUseCase) SignUp(ctx context.Context, username,
-	password string, role int) (responses *models.AuthResponses) {
+func (a *AuthUseCase) SignUp(username, password string) (token string, err error) {
 
-	if len(username) == 0 {
-		return &models.AuthResponses{
-			Ok:    "false",
-			Err:   errorsCustom.ZeroLenUsername.Error(),
-			Token: "",
-		}
+	if len(username) < 6 {
+		return "", errorsCustom.LenUsernameLessSixSymbols
 	}
+
 	if len(password) < 6 {
-		return &models.AuthResponses{
-			Ok:    "false",
-			Err:   errorsCustom.LenPasswordLessSixSymbols.Error(),
-			Token: "",
-		}
+		return "", errorsCustom.LenPasswordLessSixSymbols
 	}
 
-	userInDB, err := a.userRepo.GetUserForLogin(ctx, username)
+	userInDB, err := a.userRepo.GetUserForLogin(username)
 	if userInDB != nil {
-		return &models.AuthResponses{
-			Ok:    "false",
-			Err:   errorsCustom.FindUserDuplicate.Error(),
-			Token: "",
-		}
+		return "", errorsCustom.FindUserDuplicate
 	}
+
 	if err != nil && err != errorsCustom.UserNotFound {
-		return &models.AuthResponses{
-			Ok:    "false",
-			Err:   errorsCustom.FailedSignUp.Error(),
-			Token: "",
-		}
+		return "", errorsCustom.FailedSignUp
 	}
 
 	pwd := sha1.New()
@@ -71,84 +55,48 @@ func (a *AuthUseCase) SignUp(ctx context.Context, username,
 	user := &models.User{
 		UserName: username,
 		Password: hex.EncodeToString(pwd.Sum(nil)),
-		Role:     role,
+		Role:     0,
 	}
 
-	err = a.userRepo.CreateUser(ctx, user)
+	err = a.userRepo.CreateUser(user)
 	if err != nil {
-		return &models.AuthResponses{
-			Ok:    "false",
-			Err:   errorsCustom.FailedSignUp.Error(),
-			Token: "",
-		}
+		return "", errorsCustom.FailedSignUp
 	}
 
-	token, err := helpers_function.GetTokenByUser(user)
+	token, err = helpers_function.GetTokenByUser(user)
 	if err != nil {
-		return &models.AuthResponses{
-			Ok:    "false",
-			Err:   errorsCustom.FailedGenToken.Error(),
-			Token: token,
-		}
+		return "", errorsCustom.FailedGenToken
 	}
 
-	return &models.AuthResponses{
-		Ok:    "true",
-		Err:   "",
-		Token: token,
-	}
+	return token, nil
 }
 
-func (a *AuthUseCase) SignIn(ctx context.Context,
-	username, password string) (responses *models.AuthResponses) {
+func (a *AuthUseCase) SignIn(username, password string) (token string, err error) {
 
-	if len(username) == 0 {
-		return &models.AuthResponses{
-			Ok:    "false",
-			Err:   errorsCustom.ZeroLenUsername.Error(),
-			Token: "",
-		}
+	if len(username) < 6 {
+		return "", errorsCustom.LenUsernameLessSixSymbols
 	}
+
 	if len(password) < 6 {
-		return &models.AuthResponses{
-			Ok:    "false",
-			Err:   errorsCustom.LenPasswordLessSixSymbols.Error(),
-			Token: "",
-		}
+		return "", errorsCustom.LenPasswordLessSixSymbols
 	}
 
 	pwd := sha1.New()
 	pwd.Write([]byte(password))
 	pwd.Write([]byte(a.hashSalt))
 
-	userInDB, err := a.userRepo.GetUserForLoginAndPassword(ctx, username, hex.EncodeToString(pwd.Sum(nil)))
+	userInDB, err := a.userRepo.GetUserForLoginAndPassword(username, hex.EncodeToString(pwd.Sum(nil)))
 	if userInDB == nil {
-		return &models.AuthResponses{
-			Ok:    "false",
-			Err:   errorsCustom.UserNotFound.Error(),
-			Token: "",
-		}
+		return "", errorsCustom.UserNotFound
 	}
 	if err != nil {
-		return &models.AuthResponses{
-			Ok:    "false",
-			Err:   errorsCustom.FailedSignUp.Error(),
-			Token: "",
-		}
+		return "", errorsCustom.FailedSignIn
 	}
 
-	token, err := helpers_function.GetTokenByUser(userInDB)
+	token, err = helpers_function.GetTokenByUser(userInDB)
 	if err != nil {
-		return &models.AuthResponses{
-			Ok:    "false",
-			Err:   errorsCustom.FailedGenToken.Error(),
-			Token: token,
-		}
+		return token, errorsCustom.FailedGenToken
 	}
 
-	return &models.AuthResponses{
-		Ok:    "true",
-		Err:   "",
-		Token: token,
-	}
+	return token, nil
 }

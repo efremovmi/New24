@@ -9,18 +9,21 @@ import (
 )
 
 func GetEnvParams() models.Config {
-	err := godotenv.Load(`/home/max/News24/.env`)
+	err := godotenv.Load(`.env`)
 
 	if err != nil {
 		log.Fatalf("Error loading .env file")
 	}
 
 	return models.Config{
-		ADDR_AUTH:                 os.Getenv("ADDR_AUTH"),
+		ADR_AUTH:                  os.Getenv("ADR_AUTH"),
 		PROTOCOL_WITH_DOMAIN_AUTH: os.Getenv("PROTOCOL_WITH_DOMAIN_AUTH"),
 
-		ADDR_CONTROL_USERS:                 os.Getenv("ADDR_CONTROL_USERS"),
+		ADR_CONTROL_USERS:                  os.Getenv("ADR_CONTROL_USERS"),
 		PROTOCOL_WITH_DOMAIN_CONTROL_USERS: os.Getenv("PROTOCOL_WITH_DOMAIN_CONTROL_USERS"),
+
+		ADR_NEWS:                  os.Getenv("ADR_NEWS"),
+		PROTOCOL_WITH_DOMAIN_NEWS: os.Getenv("PROTOCOL_WITH_DOMAIN_NEWS"),
 
 		POSTGRES_HOST:        os.Getenv("POSTGRES_HOST"),
 		POSTGRES_PORT:        os.Getenv("POSTGRES_PORT"),
@@ -29,5 +32,7 @@ func GetEnvParams() models.Config {
 		POSTGRES_PASSWORD:    os.Getenv("POSTGRES_PASSWORD"),
 		POSTGRES_TABLE_USERS: os.Getenv("POSTGRES_TABLE_USERS"),
 		HASH_SALT:            os.Getenv("HASH_SALT"),
+
+		POSTGRES_TABLE_NEWS: os.Getenv("POSTGRES_TABLE_NEWS"),
 	}
 }

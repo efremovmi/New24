@@ -35,6 +35,13 @@ func GetTokenByUser(user *models.User) (string, error) {
 
 func extractToken(c *gin.Context) string {
 	token := c.Query("token")
+	if token == "" {
+		tokenSplit := strings.Split(c.GetHeader("Cookie"), "token=")
+		if len(tokenSplit) == 2 {
+			return strings.Split(tokenSplit[1], ";")[0]
+		}
+		token = ""
+	}
 	if token != "" {
 		return token
 	}
@@ -50,7 +57,7 @@ func VerifyToken(c *gin.Context) (err error) {
 	tokenString := extractToken(c)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			return nil, errorsCustom.InvalidAccessToken
 		}
 		return []byte(os.Getenv("SIGN_KEY")), nil
 	})
@@ -64,25 +71,30 @@ func VerifyToken(c *gin.Context) (err error) {
 	return errorsCustom.TokenExpired
 }
 
-func GetUserByToken(c *gin.Context) (user *models.User, err error) {
+func getUserByToken(c *gin.Context) (user *models.User, err error) {
 	tokenString := extractToken(c)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			return nil, errorsCustom.InvalidAccessToken
 		}
 		return []byte(os.Getenv("SIGN_KEY")), nil
 	})
+
 	if err != nil {
 		return user, errorsCustom.InvalidAccessToken
 	}
+
 	claims, ok := token.Claims.(jwt.MapClaims)
+
 	if ok && token.Valid {
 		users, ok := claims["user"]
+
 		if !ok {
 			return user, errorsCustom.InvalidAccessToken
 		}
 
 		jsonUser, err := json.Marshal(users)
+
 		if err != nil {
 			return user, errorsCustom.InvalidAccessToken
 		}
@@ -92,5 +104,43 @@ func GetUserByToken(c *gin.Context) (user *models.User, err error) {
 
 		return user, nil
 	}
+
 	return user, errorsCustom.TokenExpired
+}
+
+func IsModerator(c *gin.Context) error {
+	user, err := getUserByToken(c)
+	if err != nil {
+		return err
+	}
+
+	role, err := strconv.Atoi(fmt.Sprintf("%v", user.Role))
+	if err != nil {
+		return errorsCustom.Forbidden
+	}
+
+	if role < 1 {
+		return errorsCustom.Forbidden
+	}
+
+	return nil
+}
+
+func IsAdmin(c *gin.Context) (userAdmin *models.User, err error) {
+	userAdmin, err = getUserByToken(c)
+	if err != nil {
+		return nil, err
+	}
+
+	role, err := strconv.Atoi(fmt.Sprintf("%v", userAdmin.Role))
+
+	if err != nil {
+		return nil, errorsCustom.Forbidden
+	}
+
+	if role < 2 {
+		return nil, errorsCustom.Forbidden
+	}
+
+	return userAdmin, nil
 }

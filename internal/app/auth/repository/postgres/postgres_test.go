@@ -5,7 +5,6 @@ import (
 	"News24/internal/common/helpers_function"
 	"News24/internal/models"
 
-	"context"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"log"
@@ -33,11 +32,10 @@ func TestCreateUser(t *testing.T) {
 		log.Fatalf("Error: %v", err)
 	}
 
-	err = repo.CreateUser(context.Background(),
-		&models.User{
-			UserName: "test",
-			Password: "test",
-			Role:     0})
+	err = repo.CreateUser(&models.User{
+		UserName: "test",
+		Password: "test",
+		Role:     0})
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 	}
@@ -64,7 +62,7 @@ func TestGetUserForLoginAndPassword(t *testing.T) {
 		log.Fatalf("Error: %v", err)
 	}
 
-	err = repo.CreateUser(context.Background(), &models.User{UserName: "test", Password: "test", Role: 0})
+	err = repo.CreateUser(&models.User{UserName: "test", Password: "test", Role: 0})
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 	}
@@ -96,7 +94,7 @@ func TestGetUserForLoginAndPassword(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			user, err := repo.GetUserForLoginAndPassword(context.Background(), tc.payload["username"], tc.payload["password"])
+			user, err := repo.GetUserForLoginAndPassword(tc.payload["username"], tc.payload["password"])
 			if tc.expectedError != nil {
 				assert.Equal(t, errorsCustom.UserNotFound, err)
 			} else {
@@ -129,7 +127,7 @@ func TestGetUserForLogin(t *testing.T) {
 		log.Fatalf("Error: %v", err)
 	}
 
-	err = repo.CreateUser(context.Background(), &models.User{UserName: "test", Password: "test", Role: 0})
+	err = repo.CreateUser(&models.User{UserName: "test", Password: "test", Role: 0})
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 	}
@@ -155,7 +153,7 @@ func TestGetUserForLogin(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			user, err := repo.GetUserForLogin(context.Background(), tc.payload["username"])
+			user, err := repo.GetUserForLogin(tc.payload["username"])
 			if tc.expectedError != nil {
 				assert.Equal(t, errorsCustom.UserNotFound, err)
 			} else {

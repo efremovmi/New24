@@ -5,8 +5,10 @@ import (
 	"News24/internal/app/auth/repository/postgres"
 	"News24/internal/common/helpers_function"
 	"News24/internal/models"
+	"crypto/sha1"
+	"encoding/hex"
+	"os"
 
-	"context"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"log"
@@ -40,52 +42,67 @@ func TestSignUp(t *testing.T) {
 		name          string
 		InputUser     *models.User
 		expectedError error
-		expectedResp  *models.AuthResponses
 	}{
 		{
 			name: "test 1: success sign up",
 			InputUser: &models.User{
 				UserName: "test",
-				Password: "test",
+				Password: "test123",
 				Role:     0,
 			},
-			expectedResp: &models.AuthResponses{
-				Ok:  "true",
-				Err: ""},
+			expectedError: nil,
 		},
 		{
 			name: "test 2: not success sign up",
 			InputUser: &models.User{
 				UserName: "test",
-				Password: "test123",
+				Password: "test12",
 				Role:     0,
 			},
-			expectedResp: &models.AuthResponses{
-				Ok:  "false",
-				Err: errorsCustom.FindUserDuplicate.Error()},
+			expectedError: errorsCustom.FindUserDuplicate,
 		},
 		{
 			name: "test 3: success sign up",
 			InputUser: &models.User{
 				UserName: "test123",
+				Password: "test123",
+				Role:     0,
+			},
+			expectedError: nil,
+		},
+		{
+			name: "test 4: Length password less 6 symbols",
+			InputUser: &models.User{
+				UserName: "test1234",
 				Password: "test",
 				Role:     0,
 			},
-			expectedResp: &models.AuthResponses{
-				Ok:  "true",
-				Err: ""},
+			expectedError: errorsCustom.LenPasswordLessSixSymbols,
+		},
+		{
+			name: "test 5: Length username is zero",
+			InputUser: &models.User{
+				UserName: "",
+				Password: "test123",
+				Role:     0,
+			},
+			expectedError: errorsCustom.ZeroLenUsername,
 		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			resp := authService.SignUp(
-				context.Background(),
-				fmt.Sprintf("%v", tc.InputUser.UserName),
+			expectedToken, err := getTokenByUser(fmt.Sprintf("%v", tc.InputUser.UserName),
 				fmt.Sprintf("%v", tc.InputUser.Password),
 				tc.InputUser.Role.(int))
+			assert.Equal(t, nil, err)
 
-			assert.Equal(t, tc.expectedResp.Err, resp.Err)
-			assert.Equal(t, tc.expectedResp.Ok, resp.Ok)
+			token, err := authService.SignUp(fmt.Sprintf("%v", tc.InputUser.UserName),
+				fmt.Sprintf("%v", tc.InputUser.Password))
+
+			assert.Equal(t, tc.expectedError, err)
+			if tc.expectedError == nil {
+				assert.Equal(t, expectedToken, token)
+			}
 
 		})
 	}
@@ -113,66 +130,93 @@ func TestSignIn(t *testing.T) {
 	}
 	authService := NewAuthUseCase(&userRepository, fmt.Sprintf("%v", config.HASH_SALT), time.Duration(5))
 
-	authService.SignUp(context.Background(), "test", "test", 0)
-	authService.SignUp(context.Background(), "test1", "test1", 0)
+	authService.SignUp("test", "test1234")
+	authService.SignUp("test1", "test1234")
 
 	testCases := []struct {
 		name          string
 		InputUser     *models.User
 		expectedError error
-		expectedResp  *models.AuthResponses
 	}{
 		{
 			name: "test 1: success sign in",
 			InputUser: &models.User{
 				UserName: "test",
-				Password: "test",
+				Password: "test1234",
 			},
-			expectedResp: &models.AuthResponses{
-				Ok:  "true",
-				Err: ""},
+			expectedError: nil,
 		},
 		{
 			name: "test 2: not success sign in",
 			InputUser: &models.User{
 				UserName: "test",
-				Password: "test1",
+				Password: "test112414",
 			},
-			expectedResp: &models.AuthResponses{
-				Ok:  "false",
-				Err: errorsCustom.UserNotFound.Error()},
+			expectedError: errorsCustom.UserNotFound,
 		},
 		{
 			name: "test 3: not success sign in",
 			InputUser: &models.User{
 				UserName: "test1",
-				Password: "test",
+				Password: "test12345",
 			},
-			expectedResp: &models.AuthResponses{
-				Ok:  "false",
-				Err: errorsCustom.UserNotFound.Error()},
+			expectedError: errorsCustom.UserNotFound,
 		},
 		{
 			name: "test 4: success sign in",
 			InputUser: &models.User{
 				UserName: "test1",
-				Password: "test1",
+				Password: "test1234",
 			},
-			expectedResp: &models.AuthResponses{
-				Ok:  "true",
-				Err: ""},
+			expectedError: nil,
+		},
+		{
+			name: "test 5: Length password less 6 symbols",
+			InputUser: &models.User{
+				UserName: "test1234",
+				Password: "test",
+				Role:     0,
+			},
+			expectedError: errorsCustom.LenPasswordLessSixSymbols,
+		},
+		{
+			name: "test 6: Length username is zero",
+			InputUser: &models.User{
+				UserName: "",
+				Password: "test123",
+				Role:     0,
+			},
+			expectedError: errorsCustom.ZeroLenUsername,
 		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			resp := authService.SignIn(
-				context.Background(),
+
+			token, err := authService.SignIn(
 				fmt.Sprintf("%v", tc.InputUser.UserName),
 				fmt.Sprintf("%v", tc.InputUser.Password))
 
-			assert.Equal(t, tc.expectedResp.Err, resp.Err)
-			assert.Equal(t, tc.expectedResp.Ok, resp.Ok)
+			assert.Equal(t, tc.expectedError, err)
+			if err == nil {
+				assert.NotEqual(t, 0, len(token))
+			} else {
+				assert.Equal(t, 0, len(token))
+			}
 
 		})
 	}
+}
+
+func getTokenByUser(username, password string, role int) (token string, err error) {
+	pwd := sha1.New()
+	pwd.Write([]byte(password))
+	pwd.Write([]byte(os.Getenv("HASH_SALT")))
+
+	user := &models.User{
+		UserName: username,
+		Password: hex.EncodeToString(pwd.Sum(nil)),
+		Role:     role,
+	}
+	token, err = helpers_function.GetTokenByUser(user)
+	return token, err
 }

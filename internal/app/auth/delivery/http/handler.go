@@ -3,9 +3,6 @@ package http
 import (
 	"News24/internal/app/auth"
 	errorsCustom "News24/internal/app/auth"
-	"News24/internal/models"
-
-	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -21,62 +18,57 @@ func NewHandler(useCase auth.UseCase) *Handler {
 }
 
 func (h *Handler) SignUp(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
 	var inp struct {
 		UserName string `json:"username"`
 		Password string `json:"password"`
-		Role     int    `json:"role"`
 	}
 
 	if err := c.BindJSON(&inp); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		c.JSON(http.StatusBadRequest, models.AuthResponses{
-			Ok:    "false",
-			Err:   errorsCustom.BadRequest.Error(),
-			Token: ""})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err": errorsCustom.BadRequest.Error()})
 		return
 	}
 
-	resp := h.useCase.SignUp(c.Request.Context(), inp.UserName, inp.Password, inp.Role)
-	if resp.Err != "" {
-		c.AbortWithError(http.StatusBadRequest, errors.New(resp.Err))
-		c.JSON(http.StatusBadRequest, resp)
+	token, err := h.useCase.SignUp(inp.UserName, inp.Password)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, models.AuthResponses{
-		Ok:    "true",
-		Err:   resp.Err,
-		Token: resp.Token})
+	c.JSON(http.StatusOK, gin.H{
+		"token": token})
 }
 
 func (h *Handler) SignIn(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
 	var inp struct {
 		UserName string `json:"username"`
 		Password string `json:"password"`
 	}
 
 	if err := c.BindJSON(&inp); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		c.JSON(http.StatusBadRequest, models.AuthResponses{
-			Ok:    "false",
-			Err:   errorsCustom.BadRequest.Error(),
-			Token: ""})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err": errorsCustom.BadRequest.Error()})
 		return
 	}
 
-	resp := h.useCase.SignIn(c.Request.Context(), inp.UserName, inp.Password)
-	if resp.Err != "" {
-		if resp.Err == errorsCustom.UserNotFound.Error() {
-			c.AbortWithError(http.StatusUnauthorized, errorsCustom.UserNotFound)
-			c.JSON(http.StatusUnauthorized, resp)
+	token, err := h.useCase.SignIn(inp.UserName, inp.Password)
+	if err != nil {
+		if err == errorsCustom.UserNotFound {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"err": errorsCustom.InvalidLoginOrPassword.Error()})
 			return
 		}
-		c.AbortWithError(http.StatusInternalServerError, errors.New(resp.Err))
-		c.JSON(http.StatusBadRequest, resp)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, models.AuthResponses{
-		Ok:    "true",
-		Err:   resp.Err,
-		Token: resp.Token})
+	c.JSON(http.StatusOK, gin.H{
+		"token": token})
+}
+
+func (h *Handler) AuthPage(c *gin.Context) {
+	c.HTML(http.StatusOK, "auth/auth.html", nil)
 }

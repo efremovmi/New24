@@ -6,6 +6,7 @@ import (
 	"News24/internal/app/auth/repository/postgres"
 	"News24/internal/app/auth/usecase"
 	"News24/internal/models"
+	gintemplate "github.com/foolin/gin-template"
 
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -37,10 +38,12 @@ func NewApp(config *models.Config) (app *App) {
 
 func (a *App) Run() {
 	router := gin.Default()
+	router.HTMLRender = gintemplate.Default()
+	http.Handle("/static/", http.StripPrefix("/static", http.FileServer(http.Dir("/home/umd/gop/testcss/static"))))
 
 	endPoints.RegisterHTTPEndpoints(router, a.authUseCase)
 
-	router.Run(fmt.Sprintf("%v", a.config.ADDR_AUTH))
+	router.Run(fmt.Sprintf("%v", a.config.ADR_AUTH))
 }
 
 func initDB(config *models.Config) (db *postgres.UserRepository, err error) {

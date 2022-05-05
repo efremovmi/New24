@@ -4,8 +4,6 @@ import (
 	ctrlUsers "News24/internal/app/control_users"
 	errorsCustom "News24/internal/app/control_users"
 	"News24/internal/models"
-
-	"context"
 	"crypto/sha1"
 	"encoding/hex"
 )
@@ -23,28 +21,19 @@ func NewContolUserUseCase(userRepo ctrlUsers.UserRepository, hashSalt string) *C
 	}
 }
 
-func (c *ContolUserUseCase) AddUser(ctx context.Context, username,
-	password string, role int) (responses *models.StandardResponses) {
+func (c *ContolUserUseCase) AddUser(username, password string, role int) (err error) {
 
 	if len(username) == 0 {
-		return &models.StandardResponses{
-			Ok:  "false",
-			Err: errorsCustom.ZeroLenUsername.Error(),
-		}
-	}
-	if len(password) < 6 {
-		return &models.StandardResponses{
-			Ok:  "false",
-			Err: errorsCustom.LenPasswordLessSixSymbols.Error(),
-		}
+		return errorsCustom.ZeroLenUsername
 	}
 
-	userInDB, _ := c.userRepo.GetUserForLogin(ctx, username)
+	if len(password) < 6 {
+		return errorsCustom.LenPasswordLessSixSymbols
+	}
+
+	userInDB, _ := c.userRepo.GetUserForLogin(username)
 	if userInDB != nil {
-		return &models.StandardResponses{
-			Ok:  "false",
-			Err: errorsCustom.FindUserDuplicate.Error(),
-		}
+		return errorsCustom.FindUserDuplicate
 	}
 
 	pwd := sha1.New()
@@ -57,105 +46,63 @@ func (c *ContolUserUseCase) AddUser(ctx context.Context, username,
 		Role:     role,
 	}
 
-	err := c.userRepo.CreateUser(ctx, user)
+	err = c.userRepo.CreateUser(user)
 	if err != nil {
-		return &models.StandardResponses{
-			Ok:  "false",
-			Err: errorsCustom.FailedSignUp.Error(),
-		}
+		return errorsCustom.FailedAddUser
 	}
-	return &models.StandardResponses{
-		Ok:  "true",
-		Err: "",
-	}
+
+	return nil
 }
 
-func (c *ContolUserUseCase) DeleteUserForLogin(ctx context.Context, username string) (responses *models.StandardResponses) {
+func (c *ContolUserUseCase) DeleteUserForLogin(username string) (err error) {
 	if len(username) == 0 {
-		return &models.StandardResponses{
-			Ok:  "false",
-			Err: errorsCustom.ZeroLenUsername.Error(),
-		}
+		return errorsCustom.ZeroLenUsername
 	}
 
-	err := c.userRepo.DeleteUserForLogin(ctx, username)
+	err = c.userRepo.DeleteUserForLogin(username)
 	if err != nil {
-		return &models.StandardResponses{
-			Ok:  "false",
-			Err: err.Error(),
-		}
+		return err
 	}
 
-	return &models.StandardResponses{
-		Ok:  "true",
-		Err: "",
-	}
+	return nil
+
 }
 
-func (c *ContolUserUseCase) UpdateRoleUserForLogin(ctx context.Context,
-	username string, role int) (responses *models.StandardResponses) {
+func (c *ContolUserUseCase) UpdateRoleUserForLogin(username string, role int) (err error) {
 
 	if len(username) == 0 {
-		return &models.StandardResponses{
-			Ok:  "false",
-			Err: errorsCustom.ZeroLenUsername.Error(),
-		}
+		return errorsCustom.ZeroLenUsername
 	}
 
-	err := c.userRepo.UpdateUserRoleForLogin(ctx, username, role)
+	err = c.userRepo.UpdateUserRoleForLogin(username, role)
 	if err != nil {
-		return &models.StandardResponses{
-			Ok:  "false",
-			Err: err.Error(),
-		}
+		return err
 	}
 
-	return &models.StandardResponses{
-		Ok:  "true",
-		Err: "",
-	}
+	return nil
+
 }
 
-func (c *ContolUserUseCase) GetUserForLogin(ctx context.Context, username string) (responses *models.GetUserResponses) {
+func (c *ContolUserUseCase) GetUserForLogin(username string) (user *models.User, err error) {
 
 	if len(username) == 0 {
-		return &models.GetUserResponses{
-			Ok:   "false",
-			Err:  errorsCustom.ZeroLenUsername.Error(),
-			User: nil,
-		}
+		return user, errorsCustom.ZeroLenUsername
 	}
 
-	user, err := c.userRepo.GetUserForLogin(ctx, username)
+	user, err = c.userRepo.GetUserForLogin(username)
 	if err != nil {
-		return &models.GetUserResponses{
-			Ok:   "false",
-			Err:  err.Error(),
-			User: nil,
-		}
+		return nil, err
 	}
 
-	return &models.GetUserResponses{
-		Ok:   "true",
-		Err:  "",
-		User: user,
-	}
+	return user, nil
 }
 
-func (c *ContolUserUseCase) GetAllUsers(ctx context.Context) (responses *models.GetAllUsersResponses) {
+func (c *ContolUserUseCase) GetAllUsers() (users []*models.User, err error) {
 
-	users, err := c.userRepo.GetAllUsers(ctx)
+	users, err = c.userRepo.GetAllUsers()
 	if err != nil {
-		return &models.GetAllUsersResponses{
-			Ok:    "false",
-			Err:   err.Error(),
-			Users: nil,
-		}
+		return nil, err
 	}
 
-	return &models.GetAllUsersResponses{
-		Ok:    "true",
-		Err:   "",
-		Users: users,
-	}
+	return users, nil
 }

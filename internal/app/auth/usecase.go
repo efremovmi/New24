@@ -1,12 +1,6 @@
 package auth
 
-import (
-	"News24/internal/models"
-
-	"context"
-)
-
 type UseCase interface {
-	SignUp(ctx context.Context, username, password string, role int) (responses *models.AuthResponses)
-	SignIn(ctx context.Context, username, password string) (responses *models.AuthResponses)
+	SignUp(username, password string) (token string, err error)
+	SignIn(username, password string) (token string, err error)
 }

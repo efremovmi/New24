@@ -6,7 +6,6 @@ import (
 	"News24/internal/common/helpers_function"
 	"News24/internal/models"
 
-	"context"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"log"
@@ -36,9 +35,9 @@ func TestAddUser(t *testing.T) {
 	controlUsersService := NewContolUserUseCase(&userRepository, fmt.Sprintf("%v", config.HASH_SALT))
 
 	testCases := []struct {
-		name         string
-		InputUser    *models.User
-		expectedResp *models.StandardResponses
+		name        string
+		InputUser   *models.User
+		expectedErr error
 	}{
 		{
 			name: "test 1: length username is zero",
@@ -47,10 +46,7 @@ func TestAddUser(t *testing.T) {
 				Password: "",
 				Role:     0,
 			},
-			expectedResp: &models.StandardResponses{
-				Ok:  "false",
-				Err: errorsCustom.ZeroLenUsername.Error(),
-			},
+			expectedErr: errorsCustom.ZeroLenUsername,
 		},
 		{
 			name: "test 2: length password less 6 symbols",
@@ -59,10 +55,7 @@ func TestAddUser(t *testing.T) {
 				Password: "12345",
 				Role:     0,
 			},
-			expectedResp: &models.StandardResponses{
-				Ok:  "false",
-				Err: errorsCustom.LenPasswordLessSixSymbols.Error(),
-			},
+			expectedErr: errorsCustom.LenPasswordLessSixSymbols,
 		},
 		{
 			name: "test 3: all is ok",
@@ -71,10 +64,7 @@ func TestAddUser(t *testing.T) {
 				Password: "testtest",
 				Role:     0,
 			},
-			expectedResp: &models.StandardResponses{
-				Ok:  "true",
-				Err: "",
-			},
+			expectedErr: nil,
 		},
 		{
 			name: "test 4: duplicate found",
@@ -83,21 +73,17 @@ func TestAddUser(t *testing.T) {
 				Password: "testtest",
 				Role:     0,
 			},
-			expectedResp: &models.StandardResponses{
-				Ok:  "false",
-				Err: errorsCustom.FindUserDuplicate.Error(),
-			},
+			expectedErr: errorsCustom.FindUserDuplicate,
 		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			resp := controlUsersService.AddUser(
-				context.Background(),
+			err = controlUsersService.AddUser(
 				fmt.Sprintf("%v", tc.InputUser.UserName),
 				fmt.Sprintf("%v", tc.InputUser.Password),
 				tc.InputUser.Role.(int))
 
-			assert.Equal(t, tc.expectedResp, resp)
+			assert.Equal(t, tc.expectedErr, err)
 
 		})
 	}
@@ -126,7 +112,6 @@ func TestDeleteUserForLogin(t *testing.T) {
 	controlUsersService := NewContolUserUseCase(&userRepository, fmt.Sprintf("%v", config.HASH_SALT))
 
 	err = controlUsersService.userRepo.CreateUser(
-		context.Background(),
 		&models.User{
 			UserName: "test",
 			Password: "test123",
@@ -135,43 +120,31 @@ func TestDeleteUserForLogin(t *testing.T) {
 	assert.Equal(t, nil, err)
 
 	testCases := []struct {
-		name         string
-		InputName    string
-		expectedResp *models.StandardResponses
+		name        string
+		InputName   string
+		expectedErr error
 	}{
 		{
-			name:      "test 1: length username is zero",
-			InputName: "",
-			expectedResp: &models.StandardResponses{
-				Ok:  "false",
-				Err: errorsCustom.ZeroLenUsername.Error(),
-			},
+			name:        "test 1: length username is zero",
+			InputName:   "",
+			expectedErr: errorsCustom.ZeroLenUsername,
 		},
 		{
-			name:      "test 2: user not found",
-			InputName: "user not in bd",
-			expectedResp: &models.StandardResponses{
-				Ok:  "false",
-				Err: errorsCustom.UserNotFound.Error(),
-			},
+			name:        "test 2: user not found",
+			InputName:   "user not in bd",
+			expectedErr: errorsCustom.UserNotFound,
 		},
 		{
-			name:      "test 3: user found",
-			InputName: "test",
-			expectedResp: &models.StandardResponses{
-				Ok:  "true",
-				Err: "",
-			},
+			name:        "test 3: user found",
+			InputName:   "test",
+			expectedErr: nil,
 		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			resp := controlUsersService.DeleteUserForLogin(
-				context.Background(), tc.InputName)
+			err = controlUsersService.DeleteUserForLogin(tc.InputName)
 
-			assert.Equal(t, tc.expectedResp.Err, resp.Err)
-			assert.Equal(t, tc.expectedResp.Ok, resp.Ok)
-
+			assert.Equal(t, tc.expectedErr, err)
 		})
 	}
 }
@@ -199,7 +172,6 @@ func TestUpdateRoleUserForLogin(t *testing.T) {
 	controlUsersService := NewContolUserUseCase(&userRepository, fmt.Sprintf("%v", config.HASH_SALT))
 
 	err = controlUsersService.userRepo.CreateUser(
-		context.Background(),
 		&models.User{
 			UserName: "test",
 			Password: "test123",
@@ -208,47 +180,35 @@ func TestUpdateRoleUserForLogin(t *testing.T) {
 	assert.Equal(t, nil, err)
 
 	testCases := []struct {
-		name         string
-		InputName    string
-		InputRole    int
-		expectedResp *models.StandardResponses
+		name        string
+		InputName   string
+		InputRole   int
+		expectedErr error
 	}{
 		{
-			name:      "test 1: length username is zero",
-			InputName: "",
-			InputRole: 0,
-			expectedResp: &models.StandardResponses{
-				Ok:  "false",
-				Err: errorsCustom.ZeroLenUsername.Error(),
-			},
+			name:        "test 1: length username is zero",
+			InputName:   "",
+			InputRole:   0,
+			expectedErr: errorsCustom.ZeroLenUsername,
 		},
 		{
-			name:      "test 2: user not found",
-			InputName: "user not in bd",
-			InputRole: 0,
-			expectedResp: &models.StandardResponses{
-				Ok:  "false",
-				Err: errorsCustom.UserNotFound.Error(),
-			},
+			name:        "test 2: user not found",
+			InputName:   "user not in bd",
+			InputRole:   0,
+			expectedErr: errorsCustom.UserNotFound,
 		},
 		{
-			name:      "test 3: user updated",
-			InputName: "test",
-			InputRole: 0,
-			expectedResp: &models.StandardResponses{
-				Ok:  "true",
-				Err: "",
-			},
+			name:        "test 3: user updated",
+			InputName:   "test",
+			InputRole:   0,
+			expectedErr: nil,
 		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			resp := controlUsersService.UpdateRoleUserForLogin(
-				context.Background(), tc.InputName, tc.InputRole)
+			err = controlUsersService.UpdateRoleUserForLogin(tc.InputName, tc.InputRole)
 
-			assert.Equal(t, tc.expectedResp.Err, resp.Err)
-			assert.Equal(t, tc.expectedResp.Ok, resp.Ok)
-
+			assert.Equal(t, tc.expectedErr, err)
 		})
 	}
 }
@@ -276,7 +236,6 @@ func TestGetUserForLogin(t *testing.T) {
 	controlUsersService := NewContolUserUseCase(&userRepository, fmt.Sprintf("%v", config.HASH_SALT))
 
 	err = controlUsersService.userRepo.CreateUser(
-		context.Background(),
 		&models.User{
 			UserName: "test",
 			Password: "test123",
@@ -287,49 +246,37 @@ func TestGetUserForLogin(t *testing.T) {
 	testCases := []struct {
 		name         string
 		InputName    string
-		expectedResp *models.GetUserResponses
+		expectedErr  error
+		expectedUser *models.User
 	}{
 		{
-			name:      "test 1: length username is zero",
-			InputName: "",
-			expectedResp: &models.GetUserResponses{
-				Ok:   "false",
-				Err:  errorsCustom.ZeroLenUsername.Error(),
-				User: nil,
-			},
+			name:         "test 1: length username is zero",
+			InputName:    "",
+			expectedErr:  errorsCustom.ZeroLenUsername,
+			expectedUser: nil,
 		},
 		{
-			name:      "test 2: user not found",
-			InputName: "user not in bd",
-			expectedResp: &models.GetUserResponses{
-				Ok:   "false",
-				Err:  errorsCustom.UserNotFound.Error(),
-				User: nil,
-			},
+			name:         "test 2: user not found",
+			InputName:    "user not in bd",
+			expectedErr:  errorsCustom.UserNotFound,
+			expectedUser: nil,
 		},
 		{
-			name:      "test 3: user found",
-			InputName: "test",
-			expectedResp: &models.GetUserResponses{
-				Ok:  "true",
-				Err: "",
-				User: &models.User{
-					UserName: "test",
-					Role:     0,
-				},
-			},
+			name:         "test 3: user found",
+			InputName:    "test",
+			expectedErr:  nil,
+			expectedUser: &models.User{UserName: "test", Role: 0},
 		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			resp := controlUsersService.GetUserForLogin(
-				context.Background(), tc.InputName)
+			user, err := controlUsersService.GetUserForLogin(tc.InputName)
 
-			assert.Equal(t, tc.expectedResp.Err, resp.Err)
-			assert.Equal(t, tc.expectedResp.Ok, resp.Ok)
-			if tc.expectedResp.Ok == "false" && tc.expectedResp.User != nil {
-				assert.Equal(t, tc.expectedResp.User.UserName, resp.User.UserName)
-				assert.Equal(t, tc.expectedResp.User.Role, resp.User.Role)
+			assert.Equal(t, tc.expectedErr, err)
+
+			if tc.expectedErr == nil {
+				assert.Equal(t, tc.expectedUser.UserName, user.UserName)
+				assert.Equal(t, tc.expectedUser.Role, user.Role)
 			}
 
 		})
@@ -359,30 +306,25 @@ func TestGetAllUsers(t *testing.T) {
 	controlUsersService := NewContolUserUseCase(&userRepository, fmt.Sprintf("%v", config.HASH_SALT))
 
 	testCases := []struct {
-		name         string
-		expectedResp *models.GetAllUsersResponses
-		isAddNow     bool
+		name          string
+		expectedErr   error
+		expectedUsers []*models.User
+		isAddNow      bool
 	}{
 		{
-			name: "test 1: len user list is 0",
-			expectedResp: &models.GetAllUsersResponses{
-				Ok:    "true",
-				Err:   "",
-				Users: nil,
-			},
-			isAddNow: false,
+			name:          "test 1: len user list is 0",
+			expectedErr:   nil,
+			expectedUsers: nil,
+			isAddNow:      false,
 		},
 		{
-			name: "test 2: len user list is 1",
-			expectedResp: &models.GetAllUsersResponses{
-				Ok:  "true",
-				Err: "",
-				Users: []*models.User{
-					{
-						UserName: "test_1",
-						Password: "",
-						Role:     0,
-					},
+			name:        "test 2: len user list is 1",
+			expectedErr: nil,
+			expectedUsers: []*models.User{
+				{
+					UserName: "test_1",
+					Password: "",
+					Role:     0,
 				},
 			},
 			isAddNow: true,
@@ -393,7 +335,6 @@ func TestGetAllUsers(t *testing.T) {
 
 			if tc.isAddNow {
 				err = controlUsersService.userRepo.CreateUser(
-					context.Background(),
 					&models.User{
 						UserName: fmt.Sprintf("%s_%d", "test", i),
 						Password: "test123",
@@ -402,11 +343,10 @@ func TestGetAllUsers(t *testing.T) {
 				assert.Equal(t, nil, err)
 			}
 
-			resp := controlUsersService.GetAllUsers(context.Background())
-			assert.Equal(t, tc.expectedResp.Err, resp.Err)
-			assert.Equal(t, tc.expectedResp.Ok, resp.Ok)
+			users, err := controlUsersService.GetAllUsers()
+			assert.Equal(t, tc.expectedErr, err)
 
-			assert.Equal(t, len(tc.expectedResp.Users), len(resp.Users))
+			assert.Equal(t, len(tc.expectedUsers), len(users))
 
 		})
 	}

@@ -4,7 +4,6 @@ import (
 	errorsCustom "News24/internal/app/auth"
 	"News24/internal/models"
 
-	"context"
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
@@ -38,7 +37,7 @@ func (r *UserRepository) NewUserRepository(psqlconn, tableName string) (err erro
 	return nil
 }
 
-func (r *UserRepository) CreateUser(ctx context.Context, user *models.User) (err error) {
+func (r *UserRepository) CreateUser(user *models.User) (err error) {
 	db, err := sql.Open("postgres", r.psqlconn)
 	if err != nil {
 		return errorsCustom.IncorrectParamsConnectBD
@@ -62,7 +61,7 @@ func (r *UserRepository) CreateUser(ctx context.Context, user *models.User) (err
 	return nil
 }
 
-func (r *UserRepository) GetUserForLoginAndPassword(ctx context.Context, username, password string) (user *models.User, err error) {
+func (r *UserRepository) GetUserForLoginAndPassword(username, password string) (user *models.User, err error) {
 	db, err := sql.Open("postgres", r.psqlconn)
 	if err != nil {
 		return user, errorsCustom.IncorrectParamsConnectBD
@@ -91,7 +90,7 @@ func (r *UserRepository) GetUserForLoginAndPassword(ctx context.Context, usernam
 	return user, nil
 }
 
-func (r *UserRepository) GetUserForLogin(ctx context.Context, username string) (user *models.User, err error) {
+func (r *UserRepository) GetUserForLogin(username string) (user *models.User, err error) {
 	db, err := sql.Open("postgres", r.psqlconn)
 	if err != nil {
 		return user, errorsCustom.IncorrectParamsConnectBD

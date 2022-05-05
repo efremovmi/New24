@@ -3,13 +3,7 @@ package http
 import (
 	ctrlUsers "News24/internal/app/control_users"
 	errorsCustom "News24/internal/app/control_users"
-	"fmt"
-	"strconv"
-
-	helpersFunction "News24/internal/common/helpers_function"
-
-	"News24/internal/models"
-	"errors"
+	helpers "News24/internal/common/helpers_function"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -24,8 +18,15 @@ func NewHandler(useCase ctrlUsers.UseCase) *Handler {
 	}
 }
 
-// TODO try use token
 func (h *Handler) AddUser(c *gin.Context) {
+	_, err := helpers.IsAdmin(c)
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{
+			"err": err.Error(),
+		})
+		return
+	}
+
 	var inp struct {
 		UserName string `json:"username"`
 		Password string `json:"password"`
@@ -33,139 +34,168 @@ func (h *Handler) AddUser(c *gin.Context) {
 	}
 
 	if err := c.BindJSON(&inp); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		c.JSON(http.StatusBadRequest, models.StandardResponses{
-			Ok:  "false",
-			Err: errorsCustom.BadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err": errorsCustom.BadRequest.Error()})
 		return
 	}
 
-	resp := h.useCase.AddUser(c.Request.Context(), inp.UserName, inp.Password, inp.Role)
-	if resp.Err != "" {
-		c.AbortWithError(http.StatusBadRequest, errors.New(resp.Err))
-		c.JSON(http.StatusBadRequest, resp)
+	if inp.Role < 0 || inp.Role > 1 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err": errorsCustom.InvalidValueRole.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, models.StandardResponses{
-		Ok:  "true",
-		Err: resp.Err,
+	err = h.useCase.AddUser(inp.UserName, inp.Password, inp.Role)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": "ok",
 	})
 }
 
 func (h *Handler) DeleteUserForLogin(c *gin.Context) {
+	userAdmin, err := helpers.IsAdmin(c)
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{
+			"err": err.Error(),
+		})
+		return
+	}
+
 	var inp struct {
 		UserName string `json:"username"`
 	}
 
 	if err := c.BindJSON(&inp); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		c.JSON(http.StatusBadRequest, models.StandardResponses{
-			Ok:  "false",
-			Err: errorsCustom.BadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err": errorsCustom.BadRequest.Error()})
 		return
 	}
 
-	resp := h.useCase.DeleteUserForLogin(c.Request.Context(), inp.UserName)
-	if resp.Err != "" {
-		c.AbortWithError(http.StatusBadRequest, errors.New(resp.Err))
-		c.JSON(http.StatusBadRequest, resp)
+	if userAdmin.UserName == inp.UserName {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err": errorsCustom.DeletingSelfError.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, models.StandardResponses{
-		Ok:  "true",
-		Err: resp.Err,
+	err = h.useCase.DeleteUserForLogin(inp.UserName)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": "ok",
 	})
 }
 
 func (h *Handler) UpdateRoleUserForLogin(c *gin.Context) {
+	userAdmin, err := helpers.IsAdmin(c)
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{
+			"err": err.Error(),
+		})
+		return
+	}
+
 	var inp struct {
 		UserName string `json:"username"`
 		Role     int    `json:"role"`
 	}
 
 	if err := c.BindJSON(&inp); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		c.JSON(http.StatusBadRequest, models.StandardResponses{
-			Ok:  "false",
-			Err: errorsCustom.BadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err": errorsCustom.BadRequest.Error()})
 		return
 	}
 
-	resp := h.useCase.UpdateRoleUserForLogin(c.Request.Context(), inp.UserName, inp.Role)
-	if resp.Err != "" {
-		c.AbortWithError(http.StatusBadRequest, errors.New(resp.Err))
-		c.JSON(http.StatusBadRequest, resp)
+	if userAdmin.UserName == inp.UserName {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err": errorsCustom.UpdatingSelfRoleError.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, models.StandardResponses{
-		Ok:  "true",
-		Err: resp.Err,
+	if inp.Role < 0 || inp.Role > 1 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err": errorsCustom.InvalidValueRole.Error()})
+		return
+	}
+
+	err = h.useCase.UpdateRoleUserForLogin(inp.UserName, inp.Role)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": "ok",
 	})
 }
 
 func (h *Handler) GetUserForLogin(c *gin.Context) {
+
+	_, err := helpers.IsAdmin(c)
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{
+			"err": err.Error(),
+		})
+		return
+	}
+
 	var inp struct {
 		UserName string `json:"username"`
 	}
 
 	if err := c.BindJSON(&inp); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		c.JSON(http.StatusBadRequest, models.GetUserResponses{
-			Ok:   "false",
-			Err:  errorsCustom.BadRequest.Error(),
-			User: nil,
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err": errorsCustom.BadRequest.Error(),
 		})
 		return
 	}
 
-	resp := h.useCase.GetUserForLogin(c.Request.Context(), inp.UserName)
-	if resp.Err != "" {
-		c.AbortWithError(http.StatusBadRequest, errors.New(resp.Err))
-		c.JSON(http.StatusBadRequest, resp)
+	user, err := h.useCase.GetUserForLogin(inp.UserName)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err": err.Error(),
+		})
 		return
 	}
 
-	c.JSON(http.StatusOK, models.GetUserResponses{
-		Ok:   "true",
-		Err:  resp.Err,
-		User: resp.User,
+	c.JSON(http.StatusOK, gin.H{
+		"status": "ok",
+		"user":   user,
 	})
 }
 
 func (h *Handler) GetAllUsers(c *gin.Context) {
 
-	user, err := helpersFunction.GetUserByToken(c)
+	_, err := helpers.IsAdmin(c)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, models.GetAllUsersResponses{
-			Ok:    "false",
-			Err:   err.Error(),
-			Users: nil,
-		})
-	}
-
-	role, err := strconv.Atoi(fmt.Sprintf("%v", user.Role))
-	if role != 1 || err != nil {
-		c.JSON(http.StatusForbidden, models.GetAllUsersResponses{
-			Ok:    "false",
-			Err:   errorsCustom.Forbidden.Error(),
-			Users: nil,
+		c.JSON(http.StatusForbidden, gin.H{
+			"err": err.Error(),
 		})
 		return
 	}
 
-	resp := h.useCase.GetAllUsers(c.Request.Context())
-	if resp.Err != "" {
-		c.AbortWithError(http.StatusBadRequest, errors.New(resp.Err))
-		c.JSON(http.StatusBadRequest, resp)
+	users, err := h.useCase.GetAllUsers()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err": err.Error(),
+		})
 		return
 	}
 
-	c.JSON(http.StatusOK, models.GetAllUsersResponses{
-		Ok:    "true",
-		Err:   resp.Err,
-		Users: resp.Users,
+	c.JSON(http.StatusOK, gin.H{
+		"status": "ok",
+		"users":  users,
 	})
 }
