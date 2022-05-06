@@ -6,6 +6,7 @@ import (
 	"News24/internal/app/control_users/repository/postgres"
 	"News24/internal/app/control_users/usecase"
 	"News24/internal/models"
+	gintemplate "github.com/foolin/gin-template"
 
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -36,6 +37,7 @@ func NewApp(config *models.Config) (app *App) {
 
 func (a *App) Run() {
 	router := gin.Default()
+	router.HTMLRender = gintemplate.Default()
 
 	endPoints.RegisterHTTPEndpoints(router, a.ctrlUsersUseCase)
 

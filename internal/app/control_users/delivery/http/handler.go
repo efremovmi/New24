@@ -19,6 +19,7 @@ func NewHandler(useCase ctrlUsers.UseCase) *Handler {
 }
 
 func (h *Handler) AddUser(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
 	_, err := helpers.IsAdmin(c)
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{
@@ -59,6 +60,7 @@ func (h *Handler) AddUser(c *gin.Context) {
 }
 
 func (h *Handler) DeleteUserForLogin(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
 	userAdmin, err := helpers.IsAdmin(c)
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{
@@ -97,6 +99,7 @@ func (h *Handler) DeleteUserForLogin(c *gin.Context) {
 }
 
 func (h *Handler) UpdateRoleUserForLogin(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
 	userAdmin, err := helpers.IsAdmin(c)
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{
@@ -142,7 +145,7 @@ func (h *Handler) UpdateRoleUserForLogin(c *gin.Context) {
 }
 
 func (h *Handler) GetUserForLogin(c *gin.Context) {
-
+	c.Header("Access-Control-Allow-Origin", "*")
 	_, err := helpers.IsAdmin(c)
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{
@@ -171,13 +174,12 @@ func (h *Handler) GetUserForLogin(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"status": "ok",
-		"user":   user,
+		"user": user,
 	})
 }
 
 func (h *Handler) GetAllUsers(c *gin.Context) {
-
+	c.Header("Access-Control-Allow-Origin", "*")
 	_, err := helpers.IsAdmin(c)
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{
@@ -195,7 +197,20 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"status": "ok",
-		"users":  users,
+		"users": users,
 	})
+}
+
+func (h *Handler) GetModeratorMenuHTML(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
+	_, err := helpers.IsAdmin(c)
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{
+			"err": err.Error(),
+		})
+		return
+	}
+
+	c.HTML(http.StatusOK, "control-users/control-users.html", nil)
+	return
 }

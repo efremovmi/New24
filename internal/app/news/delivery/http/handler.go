@@ -115,21 +115,20 @@ func (h *Handler) GetNewsByRoleHTML(c *gin.Context) {
 	c.Header("Access-Control-Allow-Origin", "*")
 	_, err := helpers.IsAdmin(c)
 	if err == nil {
-		c.HTML(http.StatusOK, "main/admin_news.html", nil)
+		c.HTML(http.StatusOK, "news/admin_news.html", nil)
 		return
 	}
 
 	err = helpers.IsModerator(c)
 	if err == nil {
-		c.HTML(http.StatusOK, "main/moder_news.html", nil)
+		c.HTML(http.StatusOK, "news/moder_news.html", nil)
 		return
 	}
 
-	c.HTML(http.StatusOK, "main/client_news.html", nil)
+	c.HTML(http.StatusOK, "news/client_news.html", nil)
 }
 
 func (h *Handler) GetListPreviewNews(c *gin.Context) {
-	c.Header("Access-Control-Allow-Origin", "*")
 
 	var inp struct {
 		LastId int `json:"last_id"`

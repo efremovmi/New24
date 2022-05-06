@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Меню модератора</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" type="text/css" href=./control-users/static/css/table.css>
+  <link rel="stylesheet" type="text/css" href=./control-users/static/css/style.css>
+  <link rel="stylesheet" type="text/css" href=./control-users/static/css/radio-button.css>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.26.1/axios.min.js" integrity="sha512-bPh3uwgU5qEMipS/VOmRqynnMXGGSRv+72H/N260MQeXZIK4PG48401Bsby9Nq5P5fz7hy5UGNmC/W1Z51h2GQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+</head>
+<body>
+    <div class="message"></div>
+    <div class="position-table">
+      <div class="table-title"></div>
+      <div class="tableFixHead">
+      <table class="table-fill">
+        <thead>
+          <tr>
+            <th class="text-left">ID</th>
+            <th class="text-left">Имя</th>
+            <th class="text-left">Роль</th>
+          </tr>
+        </thead>
+          <tbody class="table-hover" id="tbody">
+            <script type="text/javascript">
+              axios.get("http://localhost:8001/control-users/get-all-users", {timeout: 5000})
+              .then(function (response) {
+                if (response.statusText == "OK") {
+                  div = document.getElementById('tbody');
+
+                  for (let i = 0; i < response.data.users.length; i += 1) {
+                    console.log(response.data.users[i]);
+
+                    var role;
+                    if (response.data.users[i].role == 2){
+                      role = "Админ";
+                    }else if (response.data.users[i].role == 1){
+                      role = "Модератор";
+                    }else if (response.data.users[i].role == 0){
+                      role = "Пользователь";
+                    }
+
+                    div.innerHTML += `<tr>
+                                        <td class="text-left">`+response.data.users[i].id+`</td>
+                                        <td class="text-left">`+response.data.users[i].user_name+`</td>
+                                        <td class="text-left">`+role+`</td>
+                                      </tr>`;
+                }
+                document.cookie = "last_element=" + response.data.users[response.data.users.length - 1].Id + " ;path=/";
+              }
+
+              })
+              .catch(function (error) {
+                if (typeof error.response === 'undefined'){
+                  error = error;
+                }else{
+                  error = error.response.data.err;
+                }
+                message.innerHTML = error;
+                message.classList.add("error", "active")
+                setTimeout(() => {
+                 message.classList.remove("error", "active")
+                }, timeOutMessage)
+              });
+        
+            </script>
+          </tbody>
+      </table>
+      </div>
+
+
+
+
+
+      <form action="" method="post" onsubmit="" id="form">
+
+        <input checked="" id="create" name="action" type="radio" value="create">
+        <label for="create">Создать</label>
+
+        <input id="update" name="action" type="radio" value="update">
+        <label for="update">Обновить</label>
+
+        <input id="delete" name="action" type="radio" value="delete">
+        <label for="delete">Удалить</label>
+
+       
+
+        <div id="wrapper">
+          <div id="arrow"></div>
+          <input id="login" placeholder="Имя" type="text">
+          <br>
+          <br>
+
+          <input class="custom-radio" type="radio" id="Moderator" name="color" value="1">
+          <label for="Moderator">Модератор</label>
+
+          <input class="custom-radio" type="radio" id="User" name="color" value="0">
+          <label for="User">Пользователь</label>
+
+          <input id="pass" placeholder="Пароль" type="password">
+
+            
+           
+
+        </div>
+        <button type="submit" id="edit_button">
+          <span>
+            <br>
+            Создать
+            <br>
+            Обновить
+            <br>
+            Удалить
+          </span>
+        </button>
+    </form>
+  </div>
+
+
+
+
+    <div class="menu">
+     <div class="menu_text">#MY #YOUR #NEWS</div>
+      <button type="submit" class="return_to_main_menu" id="return_to_main_menu">
+        Вернуться в меню
+      </button>
+    </div>
+<script src="./control-users/static/js/handler_button.js"></script>
+</body>
+</html>

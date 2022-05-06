@@ -18,6 +18,10 @@ func RegisterHTTPEndpoints(router *gin.Engine, uc ctrlUsers.UseCase) {
 		authEndpoints.POST("/update-user-role", h.UpdateRoleUserForLogin)
 		authEndpoints.GET("/get-all-users", h.GetAllUsers)
 
+		// HTML
+		authEndpoints.GET("", h.GetModeratorMenuHTML)
+		authEndpoints.Static("/static", "/home/max/KURSOVAY/News24/views/control-users/static")
+
 	}
 
 }

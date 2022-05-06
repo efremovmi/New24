@@ -23,8 +23,8 @@ func NewContolUserUseCase(userRepo ctrlUsers.UserRepository, hashSalt string) *C
 
 func (c *ContolUserUseCase) AddUser(username, password string, role int) (err error) {
 
-	if len(username) == 0 {
-		return errorsCustom.ZeroLenUsername
+	if len(username) < 6 {
+		return errorsCustom.LenUsernameLessSixSymbols
 	}
 
 	if len(password) < 6 {
@@ -55,8 +55,8 @@ func (c *ContolUserUseCase) AddUser(username, password string, role int) (err er
 }
 
 func (c *ContolUserUseCase) DeleteUserForLogin(username string) (err error) {
-	if len(username) == 0 {
-		return errorsCustom.ZeroLenUsername
+	if len(username) < 6 {
+		return errorsCustom.LenUsernameLessSixSymbols
 	}
 
 	err = c.userRepo.DeleteUserForLogin(username)
@@ -70,8 +70,8 @@ func (c *ContolUserUseCase) DeleteUserForLogin(username string) (err error) {
 
 func (c *ContolUserUseCase) UpdateRoleUserForLogin(username string, role int) (err error) {
 
-	if len(username) == 0 {
-		return errorsCustom.ZeroLenUsername
+	if len(username) < 6 {
+		return errorsCustom.LenUsernameLessSixSymbols
 	}
 
 	err = c.userRepo.UpdateUserRoleForLogin(username, role)
@@ -85,8 +85,8 @@ func (c *ContolUserUseCase) UpdateRoleUserForLogin(username string, role int) (e
 
 func (c *ContolUserUseCase) GetUserForLogin(username string) (user *models.User, err error) {
 
-	if len(username) == 0 {
-		return user, errorsCustom.ZeroLenUsername
+	if len(username) < 6 {
+		return nil, errorsCustom.LenUsernameLessSixSymbols
 	}
 
 	user, err = c.userRepo.GetUserForLogin(username)

@@ -58,8 +58,6 @@ form {
 }
 
 
-
-
 .main_text{
   font-size: large;
   text-align: left;
@@ -87,7 +85,7 @@ div.figure {
   border-color: #fff;
   border-radius: 20px;
 
-  /*border: 3px solid #fff; /* Белая рамка */*/
+  border: 3px solid #fff; /* Белая рамка */
   -webkit-transform: translate(-50%, -50%);
   -moz-transform: translate(-50%, -50%);
   -ms-transform: translate(-50%, -50%);
@@ -121,7 +119,7 @@ button {
 
   margin-bottom: 10px;
   overflow: hidden;
-  /*transition: all .3s cubic-bezier(.6,0,.4,1);*/
+  transition: all .3s cubic-bezier(.6,0,.4,1);
 }
 button span {
   display: block;
