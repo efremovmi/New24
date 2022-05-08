@@ -20,4 +20,8 @@ type Config struct {
 	POSTGRES_TABLE_NEWS interface{}
 
 	HASH_SALT interface{}
+
+	NAME_BUFFER interface{}
+
+	PATH_TO_VIEWS interface{}
 }

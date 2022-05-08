@@ -1,10 +1,10 @@
 package models
 
 type News struct {
-	Id         int
-	Header     string
-	News       string
-	PathToHTML string
+	Id         int    `json:"id"`
+	Header     string `json:"header"`
+	News       string `json:"news"`
+	PathToHTML string `json:"-"`
 }
 
 type PreviewNews struct {

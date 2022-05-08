@@ -3,7 +3,6 @@ const myForm = document.querySelector("#form")
 
 
 myForm.onsubmit = function(e) {
-  document.cookie = "token= ;path=/";
-  window.location.replace("http://localhost:8000/auth");
-  return false
+  window.location.replace("http://localhost:8002/news");
+  return false;
 }

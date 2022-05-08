@@ -39,7 +39,7 @@ func (a *App) Run() {
 	router := gin.Default()
 	router.HTMLRender = gintemplate.Default()
 
-	endPoints.RegisterHTTPEndpoints(router, a.ctrlUsersUseCase)
+	endPoints.RegisterHTTPEndpoints(router, a.ctrlUsersUseCase, fmt.Sprintf("%v", a.config.PATH_TO_VIEWS))
 
 	router.Run(fmt.Sprintf("%v", a.config.ADR_CONTROL_USERS))
 }

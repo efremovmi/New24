@@ -41,7 +41,7 @@ func (a *App) Run() {
 	router.HTMLRender = gintemplate.Default()
 	http.Handle("/static/", http.StripPrefix("/static", http.FileServer(http.Dir("/home/umd/gop/testcss/static"))))
 
-	endPoints.RegisterHTTPEndpoints(router, a.authUseCase)
+	endPoints.RegisterHTTPEndpoints(router, a.authUseCase, fmt.Sprintf("%v", a.config.PATH_TO_VIEWS))
 
 	router.Run(fmt.Sprintf("%v", a.config.ADR_AUTH))
 }

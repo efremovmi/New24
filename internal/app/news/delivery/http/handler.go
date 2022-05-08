@@ -6,6 +6,7 @@ import (
 	helpers "News24/internal/common/helpers_function"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -64,17 +65,50 @@ func (h *Handler) DeleteNewsForHeader(c *gin.Context) {
 		return
 	}
 
-	var inp struct {
-		Header string `json:"header"`
-	}
+	header := c.PostForm("header")
 
-	if err := c.BindJSON(&inp); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"err": errorsCustom.BadRequest.Error()})
+	statusCode, err := h.useCase.DeleteNewsForHeader(header)
+	if err != nil {
+		c.JSON(statusCode, gin.H{
+			"err": err.Error(),
+		})
 		return
 	}
 
-	statusCode, err := h.useCase.DeleteNewsForHeader(inp.Header)
+	c.JSON(http.StatusOK, gin.H{
+		"status": "ok",
+	})
+}
+
+func (h *Handler) UpdateNewsForId(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
+
+	err := helpers.IsModerator(c)
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{
+			"err": err.Error(),
+		})
+		return
+	}
+
+	id, err := strconv.Atoi(c.PostForm("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err": errorsCustom.BadId.Error()})
+		return
+	}
+
+	header := c.PostForm("header")
+	news := c.PostForm("news")
+	image, headerImage, err := c.Request.FormFile("image")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err": errorsCustom.BadImage.Error(),
+		})
+		return
+	}
+
+	statusCode, err := h.useCase.UpdateNewsForId(image, header, news, headerImage.Filename, id)
 	if err != nil {
 		c.JSON(statusCode, gin.H{
 			"err": err.Error(),
@@ -129,7 +163,7 @@ func (h *Handler) GetNewsByRoleHTML(c *gin.Context) {
 }
 
 func (h *Handler) GetListPreviewNews(c *gin.Context) {
-
+	c.Header("Access-Control-Allow-Origin", "*")
 	var inp struct {
 		LastId int `json:"last_id"`
 	}
@@ -152,4 +186,43 @@ func (h *Handler) GetListPreviewNews(c *gin.Context) {
 		"previewList": previewNewsList,
 	})
 
+}
+
+func (h *Handler) GetAllNews(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
+
+	err := helpers.IsModerator(c)
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{
+			"err": err.Error(),
+		})
+		return
+	}
+
+	newsList, _, statusCode, err := h.useCase.GetAllNews()
+	if err != nil {
+		c.JSON(statusCode, gin.H{
+			"err": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"news_list": newsList,
+	})
+
+}
+
+func (h *Handler) GetModeratorMenu(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
+
+	err := helpers.IsModerator(c)
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{
+			"err": err.Error(),
+		})
+		return
+	}
+
+	c.HTML(http.StatusOK, "news/moder-menu/moder-menu.html", nil)
 }

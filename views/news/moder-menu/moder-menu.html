@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Меню админа</title>
+  <title>Меню модератора</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link rel="stylesheet" type="text/css" href=./control-users/static/css/table.css>
+<!--   <link rel="stylesheet" type="text/css" href=./control-users/static/css/table.css>
   <link rel="stylesheet" type="text/css" href=./control-users/static/css/style.css>
   <link rel="stylesheet" type="text/css" href=./control-users/static/css/radio-button.css>
+ -->
+  <link rel="stylesheet" type="text/css" href=./views/news/moder-menu/static/css/table.css>
+  <link rel="stylesheet" type="text/css" href=./views/news/moder-menu/static/css/style.css>
+  <link rel="stylesheet" type="text/css" href=./views/news/moder-menu/static/css/radio-button.css>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.26.1/axios.min.js" integrity="sha512-bPh3uwgU5qEMipS/VOmRqynnMXGGSRv+72H/N260MQeXZIK4PG48401Bsby9Nq5P5fz7hy5UGNmC/W1Z51h2GQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -22,33 +26,27 @@
         <thead>
           <tr>
             <th class="text-left">ID</th>
-            <th class="text-left">Имя</th>
-            <th class="text-left">Роль</th>
+            <th class="text-left">Название новости</th>
+            <th class="text-left">Основной текст</th>
+            <th class="text-left">Фотография</th>
+
           </tr>
         </thead>
           <tbody class="table-hover" id="tbody">
             <script type="text/javascript">
-              axios.get("http://localhost:8001/control-users/get-all-users", {timeout: 5000})
+              axios.get("http://localhost:8002/news/get-all-news", {timeout: 5000})
               .then(function (response) {
                 if (response.statusText == "OK") {
                   div = document.getElementById('tbody');
 
-                  for (let i = 0; i < response.data.users.length; i += 1) {
-                    console.log(response.data.users[i]);
-
-                    var role;
-                    if (response.data.users[i].role == 2){
-                      role = "Админ";
-                    }else if (response.data.users[i].role == 1){
-                      role = "Модератор";
-                    }else if (response.data.users[i].role == 0){
-                      role = "Пользователь";
-                    }
+                  for (let i = 0; i < response.data.news_list.length; i += 1) {
+                    console.log(response.data.news_list[i]);
 
                     div.innerHTML += `<tr>
-                                        <td class="text-left">`+response.data.users[i].id+`</td>
-                                        <td class="text-left">`+response.data.users[i].user_name+`</td>
-                                        <td class="text-left">`+role+`</td>
+                                        <td class="text-left">`+response.data.news_list[i].id+`</td>
+                                        <td class="text-left"><a href="http://localhost:8002/news/get-post?header=`+response.data.news_list[i].header+`">`+response.data.news_list[i].header+`</a></td>                               
+                                        <td class="text-left">`+response.data.news_list[i].news+`</td>
+                                        <td class="text-left"><img src="./views/` + response.data.news_list[i].header + `/` + response.data.news_list[i].header + `.jpeg" alt=""></td>
                                       </tr>`;
                 }
               }
@@ -74,15 +72,15 @@
 
 
 
-
-
       <form action="" method="post" onsubmit="" id="form">
+
+       
+        <input id="update" name="action" type="radio" value="update">
+        <label for="update">Обновить</label>
 
         <input checked="" id="create" name="action" type="radio" value="create">
         <label for="create">Создать</label>
 
-        <input id="update" name="action" type="radio" value="update">
-        <label for="update">Обновить</label>
 
         <input id="delete" name="action" type="radio" value="delete">
         <label for="delete">Удалить</label>
@@ -91,17 +89,20 @@
 
         <div id="wrapper">
           <div id="arrow"></div>
-          <input id="login" placeholder="Имя" type="text">
+          
+          <input id="name-news" placeholder="Название новости" type="text">
+
           <br>
           <br>
 
-          <input class="custom-radio" type="radio" id="Moderator" name="color" value="1">
-          <label for="Moderator">Модератор</label>
+          <label class="custom-image-upload">
+              <input type="file" id="custom-image-upload">
+              Загрузить фотографию
+          </label>
 
-          <input class="custom-radio" type="radio" id="User" name="color" value="0">
-          <label for="User">Пользователь</label>
 
-          <input id="pass" placeholder="Пароль" type="password">
+          <textarea id="full-news" name="full-news" placeholder="Новость"></textarea>
+          <input id="id-news" placeholder="Id записи" type="text">
 
             
            
@@ -129,6 +130,7 @@
         Вернуться в меню
       </button>
     </div>
-<script src="./control-users/static/js/handler_button.js"></script>
+<!-- <script src="./control-users/static/js/handler_button.js"></script> -->
+<script src="./views/news/moder-menu/static/js/handler_button.js"></script>
 </body>
 </html>

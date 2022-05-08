@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterHTTPEndpoints(router *gin.Engine, uc auth.UseCase) {
+func RegisterHTTPEndpoints(router *gin.Engine, uc auth.UseCase, pathToViews string) {
 	h := NewHandler(uc)
 
 	authEndpoints := router.Group("/auth")
@@ -16,6 +16,6 @@ func RegisterHTTPEndpoints(router *gin.Engine, uc auth.UseCase) {
 
 		// HTML
 		authEndpoints.GET("", h.AuthPage)
-		authEndpoints.Static("/static", "/home/max/KURSOVAY/News24/views/auth/static")
+		authEndpoints.Static("/static", pathToViews+"/auth/static")
 	}
 }

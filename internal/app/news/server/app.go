@@ -11,7 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"os"
 )
 
 type App struct {
@@ -26,14 +25,7 @@ func NewApp(config *models.Config) (app *App) {
 		log.Fatalf("Error: %v", err)
 	}
 
-	err = os.Mkdir("storage", 0777)
-	if err != nil {
-		if err.Error() != "mkdir storage: file exists" {
-			log.Fatalf("Error: %v", err)
-		}
-	}
-
-	newsService := usecase.NewNewsUseCase(db, fmt.Sprintf("%v", "views"))
+	newsService := usecase.NewNewsUseCase(db, fmt.Sprintf("%v", "views"), fmt.Sprintf("%v", config.NAME_BUFFER))
 
 	app = &App{
 		config:      config,
@@ -46,7 +38,7 @@ func (a *App) Run() {
 	router := gin.Default()
 	router.HTMLRender = gintemplate.Default()
 
-	endPoints.RegisterHTTPEndpoints(router, a.newsUseCase)
+	endPoints.RegisterHTTPEndpoints(router, a.newsUseCase, fmt.Sprintf("%v", a.config.PATH_TO_VIEWS))
 
 	router.Run(fmt.Sprintf("%v", a.config.ADR_NEWS))
 }

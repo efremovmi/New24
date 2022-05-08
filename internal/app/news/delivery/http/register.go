@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterHTTPEndpoints(router *gin.Engine, uc news.UseCase) {
+func RegisterHTTPEndpoints(router *gin.Engine, uc news.UseCase, pathToViews string) {
 
 	h := NewHandler(uc)
 
@@ -14,13 +14,16 @@ func RegisterHTTPEndpoints(router *gin.Engine, uc news.UseCase) {
 	{
 		authEndpoints.Use(middleware.JwtAuthMiddleware())
 		authEndpoints.POST("/save-post", h.SaveNews)
+		authEndpoints.POST("/update-post", h.UpdateNewsForId)
 		authEndpoints.POST("/delete-post", h.DeleteNewsForHeader)
 		authEndpoints.POST("/get-preview-list", h.GetListPreviewNews)
+		authEndpoints.GET("/get-all-news", h.GetAllNews)
+		authEndpoints.GET("/get-moder-menu", h.GetModeratorMenu)
 
 		// HTML
 		authEndpoints.GET("/get-post", h.GetNewsHTMLForHeader)
 		authEndpoints.GET("", h.GetNewsByRoleHTML)
-		authEndpoints.Static("/views", "/home/max/KURSOVAY/News24/views")
+		authEndpoints.Static("/views", pathToViews)
 	}
 
 }

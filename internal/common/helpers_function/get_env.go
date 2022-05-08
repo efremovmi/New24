@@ -34,5 +34,9 @@ func GetEnvParams() models.Config {
 		HASH_SALT:            os.Getenv("HASH_SALT"),
 
 		POSTGRES_TABLE_NEWS: os.Getenv("POSTGRES_TABLE_NEWS"),
+
+		NAME_BUFFER: os.Getenv("NAME_BUFFER"),
+
+		PATH_TO_VIEWS: os.Getenv("PATH_TO_VIEWS"),
 	}
 }

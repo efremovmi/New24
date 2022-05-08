@@ -81,10 +81,10 @@ func (r *NewsRepository) UpdateNewsForId(newNews *models.News, id int) (err erro
 	}
 	defer db.Close()
 
-	query := fmt.Sprintf("UPDATE %s set news = %s, header = %s, path_to_image = %s where id = '%s' returning id;",
+	query := fmt.Sprintf("UPDATE %s set news_text = '%s', header = '%s', path_to_html = '%s' where id = %d returning id;",
 		r.tableName,
-		newNews.Header,
 		newNews.News,
+		newNews.Header,
 		newNews.PathToHTML,
 		id)
 
@@ -107,6 +107,26 @@ func (r *NewsRepository) GetNewsForHeader(header string) (news *models.News, err
 	query := fmt.Sprintf("SELECT id, header, news_text, path_to_html FROM %s WHERE header = '%s';",
 		r.tableName,
 		header)
+
+	news = &models.News{}
+
+	if err = db.QueryRow(query).Scan(&news.Id, &news.Header, &news.News, &news.PathToHTML); err != nil {
+		return nil, errorsCustom.NewsNotFound
+	}
+
+	return news, nil
+}
+
+func (r *NewsRepository) GetNewsForId(id int) (news *models.News, err error) {
+	db, err := sql.Open("postgres", r.psqlconn)
+	if err != nil {
+		return nil, errorsCustom.IncorrectParamsConnectBD
+	}
+	defer db.Close()
+
+	query := fmt.Sprintf("SELECT id, header, news_text, path_to_html FROM %s WHERE id = %d;",
+		r.tableName,
+		id)
 
 	news = &models.News{}
 
@@ -144,4 +164,33 @@ func (r *NewsRepository) GetListPreviewNews(lastId int) (previewNewsList []*mode
 	}
 
 	return previewNewsList, nil
+}
+
+func (r *NewsRepository) GetAllNews() (newsList []*models.News, err error) {
+	db, err := sql.Open("postgres", r.psqlconn)
+	newsList = make([]*models.News, 0)
+
+	if err != nil {
+		return newsList, errorsCustom.IncorrectParamsConnectBD
+	}
+	defer db.Close()
+
+	query := fmt.Sprintf("select id, header, news_text from %s;", r.tableName)
+
+	rows, err := db.Query(query)
+	if err != nil {
+		return make([]*models.News, 0), errorsCustom.BadGetNewsList
+	}
+
+	for rows.Next() {
+		news := models.News{}
+		err = rows.Scan(&news.Id, &news.Header, &news.News)
+		if err != nil {
+			return make([]*models.News, 0), errorsCustom.BadGetNewsList
+		}
+
+		newsList = append(newsList, &news)
+	}
+
+	return newsList, nil
 }
