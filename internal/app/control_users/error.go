@@ -19,7 +19,7 @@ var (
 	InvalidValueRole          = errors.New("Role value must be in the range [0,1]")
 	UserNotFound              = errors.New("Пользователь не найден")
 	FindUserDuplicate         = errors.New("Пользователь с таким логином уже существует")
-	LenUsernameLessSixSymbols = errors.New("Длина имени пользователя даолжна быть больше 5 символов")
+	LenUsernameLessSixSymbols = errors.New("Длина имени пользователя должна быть больше 5 символов")
 	LenPasswordLessSixSymbols = errors.New("Длина пароля должна быть больше 5 символов")
 	BadRequest                = errors.New("Некорректное тело запроса")
 )

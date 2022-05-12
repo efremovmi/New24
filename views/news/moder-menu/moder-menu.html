@@ -9,9 +9,9 @@
   <link rel="stylesheet" type="text/css" href=./control-users/static/css/style.css>
   <link rel="stylesheet" type="text/css" href=./control-users/static/css/radio-button.css>
  -->
-  <link rel="stylesheet" type="text/css" href=./views/news/moder-menu/static/css/table.css>
-  <link rel="stylesheet" type="text/css" href=./views/news/moder-menu/static/css/style.css>
-  <link rel="stylesheet" type="text/css" href=./views/news/moder-menu/static/css/radio-button.css>
+  <link rel="stylesheet" type="text/css" href=./moder-menu/static/css/table.css>
+  <link rel="stylesheet" type="text/css" href=./moder-menu/static/css/style.css>
+  <link rel="stylesheet" type="text/css" href=./moder-menu/static/css/radio-button.css>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.26.1/axios.min.js" integrity="sha512-bPh3uwgU5qEMipS/VOmRqynnMXGGSRv+72H/N260MQeXZIK4PG48401Bsby9Nq5P5fz7hy5UGNmC/W1Z51h2GQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -34,7 +34,7 @@
         </thead>
           <tbody class="table-hover" id="tbody">
             <script type="text/javascript">
-              axios.get("http://localhost:8002/news/get-all-news", {timeout: 5000})
+              axios.get("http://localhost/news/get-all-news", {timeout: 5000})
               .then(function (response) {
                 if (response.statusText == "OK") {
                   div = document.getElementById('tbody');
@@ -44,9 +44,9 @@
 
                     div.innerHTML += `<tr>
                                         <td class="text-left">`+response.data.news_list[i].id+`</td>
-                                        <td class="text-left"><a href="http://localhost:8002/news/get-post?header=`+response.data.news_list[i].header+`">`+response.data.news_list[i].header+`</a></td>                               
+                                        <td class="text-left"><a href="http://localhost/news/get-post?header=`+response.data.news_list[i].header+`">`+response.data.news_list[i].header+`</a></td>                               
                                         <td class="text-left">`+response.data.news_list[i].news+`</td>
-                                        <td class="text-left"><img src="./views/` + response.data.news_list[i].header + `/` + response.data.news_list[i].header + `.jpeg" alt=""></td>
+                                        <td class="text-left"><img src="http:/`+`/localhost/` + response.data.news_list[i].header + `/` + response.data.news_list[i].header + `.jpeg" alt=""></td>
                                       </tr>`;
                 }
               }
@@ -131,6 +131,6 @@
       </button>
     </div>
 <!-- <script src="./control-users/static/js/handler_button.js"></script> -->
-<script src="./views/news/moder-menu/static/js/handler_button.js"></script>
+<script src="./moder-menu/static/js/handler_button.js"></script>
 </body>
 </html>

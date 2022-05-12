@@ -28,7 +28,7 @@
         </thead>
           <tbody class="table-hover" id="tbody">
             <script type="text/javascript">
-              axios.get("http://localhost:8001/control-users/get-all-users", {timeout: 5000})
+              axios.get("http://localhost/control-users/get-all-users", {timeout: 5000})
               .then(function (response) {
                 if (response.statusText == "OK") {
                   div = document.getElementById('tbody');
@@ -95,7 +95,7 @@
           <br>
           <br>
 
-          <input class="custom-radio" type="radio" id="Moderator" name="color" value="1">
+          <input checked="" class="custom-radio" type="radio" id="Moderator" name="color" value="1">
           <label for="Moderator">Модератор</label>
 
           <input class="custom-radio" type="radio" id="User" name="color" value="0">

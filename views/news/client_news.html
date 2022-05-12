@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>News</title>
+  <title>Новости</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -9,7 +9,7 @@
 
 
 
-  <link rel="stylesheet" type="text/css" href="./news/views/news/static/css/style.css">
+  <link rel="stylesheet" type="text/css" href="./news/static/css/style.css">
   <!-- <link rel="stylesheet" type="text/css" href="./static/css/style.css"> -->
 
 
@@ -22,10 +22,10 @@
        <div id="infinite-scroll">
           <div>
          
-          <script>
+         <script>
             document.cookie = "last_element=" + 0 + " ;path=/";
             const dataJSON = JSON.stringify({last_id: 0});
-            axios.post("http://localhost:8002/news/get-preview-list", dataJSON, {timeout: 5000})
+            axios.post("http://localhost/news/get-preview-list", dataJSON, {timeout: 5000})
             .then(function (response) {
               if (response.statusText == "OK") {
                 div = document.getElementById('rectangle');
@@ -34,9 +34,9 @@
                   console.log(response.data.previewList[i]);
 
                   div.innerHTML +=  `<div class=figure>
-                                    <p><img class=scaled src="./news/views/` + response.data.previewList[i].Header + `/` + response.data.previewList[i].Header + `.jpeg"
+                                    <p><img class=scaled src="./` + response.data.previewList[i].Header + `/` + response.data.previewList[i].Header + `.jpeg"
                                       alt="` + response.data.previewList[i].Header + `">
-                                    <p><a href="http://localhost:8002/news/get-post?header=`+response.data.previewList[i].Header+`">`+response.data.previewList[i].Header+`</a>
+                                    <p><a href="http://localhost/news/get-post?header=`+response.data.previewList[i].Header+`">`+response.data.previewList[i].Header+`</a>
                                   </div>`;
               }
               document.cookie = "last_element=" + response.data.previewList[response.data.previewList.length - 1].Id + " ;path=/";
@@ -51,7 +51,7 @@
           </script>
           </div>
         </div>
-        <script>
+         <script>
             function getCookie(name) {
               var value = "; " + document.cookie;
               var parts = value.split("; " + name + "=");
@@ -73,7 +73,7 @@
                 {
                   last_id = parseInt(getCookie("last_element"), 10)
                   const dataJSON = JSON.stringify({last_id: last_id});
-                  axios.post("http://localhost:8002/news/get-preview-list", dataJSON, {timeout: 5000})
+                  axios.post("http://localhost/news/get-preview-list", dataJSON, {timeout: 5000})
                   .then(function (response) {
                     if (response.statusText == "OK" && response.data.previewList.length != 0 && parseInt(getCookie("last_element"), 10) < response.data.previewList[response.data.previewList.length - 1].Id) {
                       
@@ -82,10 +82,10 @@
                         console.log(response.data.previewList[i]);
 
                         block.innerHTML +=  `<div class=figure>
-                                          <p><img class=scaled src="./news/views/` + response.data.previewList[i].Header + `/` + response.data.previewList[i].Header + `.jpeg"
-                                            alt="` + response.data.previewList[i].Header + `">
-                                          <p><a href="http://localhost:8002/news/get-post?header=`+response.data.previewList[i].Header+`">`+response.data.previewList[i].Header+`</a>
-                                        </div>`;
+                                              <p><img class=scaled src="./` + response.data.previewList[i].Header + `/` + response.data.previewList[i].Header + `.jpeg"
+                                                alt="` + response.data.previewList[i].Header + `">
+                                              <p><a href="http://localhost/news/get-post?header=`+response.data.previewList[i].Header+`">`+response.data.previewList[i].Header+`</a>
+                                            </div>`;
                         lastId = response.data.previewList[i].Id;
                     }
                     document.cookie = "last_element=" + lastId + " ;path=/";
@@ -108,7 +108,7 @@
     </div>
    </div>
 
-  <script src="./news/views/news/static/js/main.js"></script>
+  <script src="./news/static/js/main.js"></script>
   <!-- <script src="./static/js/main.js"></script> -->
 
 

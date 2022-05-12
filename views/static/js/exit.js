@@ -3,6 +3,6 @@ const myForm = document.querySelector("#form")
 
 
 myForm.onsubmit = function(e) {
-  window.location.replace("http://localhost:8002/news");
+  window.location.replace("http://localhost/news");
   return false;
 }

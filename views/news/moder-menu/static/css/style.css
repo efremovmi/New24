@@ -25,7 +25,7 @@ body {
 
 #create:checked ~ #wrapper { height: 330px; }
 #create:checked ~ #wrapper #arrow { left: 155px; }
-#create:checked ~ button span { transform: translate3d(0,-1px,0); }
+#create:checked ~ button span { transform: translate3d(0,-71px,0); }
 
 #delete:checked ~ #wrapper { height: 90px; }
 #delete:checked ~ #wrapper #arrow { left: 285px; }
@@ -65,7 +65,7 @@ form {
   margin: -185px -225px;
   position: relative;
   left: 129%;
-  top: -153%;
+  top: -108%;
 }
 
 input[type=radio] { display: none; }

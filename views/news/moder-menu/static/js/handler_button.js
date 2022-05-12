@@ -4,7 +4,7 @@ const editFunction = document.getElementById("edit_button")
 const exitFunction = document.getElementById("return_to_main_menu")
 
 exitFunction.onclick = function(e) {
-  window.location.replace("http://localhost:8002/news");
+  window.location.replace("http://localhost/news");
   return false
 }
 
@@ -21,7 +21,7 @@ editFunction.onclick = function(e) {
 
 
   if (document.getElementById('create').checked == true) {
-    axios.post(`http://localhost:8002/news/save-post`, formData, {timeout: 5000})
+    axios.post(`http://localhost/news/save-post`, formData, {timeout: 5000})
     .then(function (response) {
       if (response.statusText == "OK") {
         message.innerHTML = "Новость добавлена!"
@@ -33,7 +33,7 @@ editFunction.onclick = function(e) {
         document.getElementById('name-news').value = "";
         document.getElementById('full-news').value = ""; 
 
-         axios.get("http://localhost:8002/news/get-all-news", {timeout: 5000})
+         axios.get("http://localhost/news/get-all-news", {timeout: 5000})
         .then(function (response) {
           if (response.statusText == "OK") {
             div = document.getElementById('tbody');
@@ -41,12 +41,12 @@ editFunction.onclick = function(e) {
             for (let i = 0; i < response.data.news_list.length; i += 1) {
               console.log(response.data.news_list[i]);
 
-              div.innerHTML += `<tr>
-                                  <td class="text-left">`+response.data.news_list[i].id+`</td>
-                                  <td class="text-left"><a href="http://localhost:8002/news/get-post?header=`+response.data.news_list[i].header+`">`+response.data.news_list[i].header+`</a></td>                               
-                                  <td class="text-left">`+response.data.news_list[i].news+`</td>
-                                  <td class="text-left"><img src="./views/` + response.data.news_list[i].header + `/` + response.data.news_list[i].header + `.jpeg" alt=""></td>
-                                </tr>`;
+            div.innerHTML += `<tr>
+                              <td class="text-left">`+response.data.news_list[i].id+`</td>
+                              <td class="text-left"><a href="http://localhost/news/get-post?header=`+response.data.news_list[i].header+`">`+response.data.news_list[i].header+`</a></td>                               
+                              <td class="text-left">`+response.data.news_list[i].news+`</td>
+                              <td class="text-left"><img src="http:/`+`/localhost/` + response.data.news_list[i].header + `/` + response.data.news_list[i].header + `.jpeg" alt=""></td>
+                            </tr>`;
             }
           }
         })
@@ -81,7 +81,7 @@ editFunction.onclick = function(e) {
     });
 
   }else if (document.getElementById('delete').checked == true) {
-    axios.post(`http://localhost:8002/news/delete-post`, formData, {timeout: 5000})
+    axios.post(`http://localhost/news/delete-post`, formData, {timeout: 5000})
     .then(function (response) {
       if (response.statusText == "OK") {
         message.innerHTML = "Новость удалена!"
@@ -94,7 +94,7 @@ editFunction.onclick = function(e) {
         document.getElementById('name-news').value = "";
         document.getElementById('full-news').value = ""; 
 
-         axios.get("http://localhost:8002/news/get-all-news", {timeout: 5000})
+         axios.get("http://localhost/news/get-all-news", {timeout: 5000})
         .then(function (response) {
           if (response.statusText == "OK") {
             div = document.getElementById('tbody');
@@ -103,11 +103,11 @@ editFunction.onclick = function(e) {
               console.log(response.data.news_list[i]);
 
               div.innerHTML += `<tr>
-                                  <td class="text-left">`+response.data.news_list[i].id+`</td>
-                                  <td class="text-left"><a href="http://localhost:8002/news/get-post?header=`+response.data.news_list[i].header+`">`+response.data.news_list[i].header+`</a></td>                               
-                                  <td class="text-left">`+response.data.news_list[i].news+`</td>
-                                  <td class="text-left"><img src="./views/` + response.data.news_list[i].header + `/` + response.data.news_list[i].header + `.jpeg" alt=""></td>
-                                </tr>`;
+                                <td class="text-left">`+response.data.news_list[i].id+`</td>
+                                <td class="text-left"><a href="http://localhost/news/get-post?header=`+response.data.news_list[i].header+`">`+response.data.news_list[i].header+`</a></td>                               
+                                <td class="text-left">`+response.data.news_list[i].news+`</td>
+                                <td class="text-left"><img src="http:/`+`/localhost/` + response.data.news_list[i].header + `/` + response.data.news_list[i].header + `.jpeg" alt=""></td>
+                              </tr>`;
             }
           }
         })
@@ -143,10 +143,10 @@ editFunction.onclick = function(e) {
   }
  
   else if (document.getElementById('update').checked == true) {
-    axios.post(`http://localhost:8002/news/update-post`, formData, {timeout: 5000})
+    axios.post(`http://localhost/news/update-post`, formData, {timeout: 5000})
     .then(function (response) {
       if (response.statusText == "OK") {
-        message.innerHTML = "Роль пользователя обновлена!"
+        message.innerHTML = "Новость обновлена!"
         message.classList.add("active")
         setTimeout(() => {
           message.classList.remove("active")
@@ -155,7 +155,7 @@ editFunction.onclick = function(e) {
         document.getElementById('name-news').value = "";
         document.getElementById('full-news').value = ""; 
 
-         axios.get("http://localhost:8002/news/get-all-news", {timeout: 5000})
+         axios.get("http://localhost/news/get-all-news", {timeout: 5000})
         .then(function (response) {
           if (response.statusText == "OK") {
             div = document.getElementById('tbody');
@@ -164,11 +164,11 @@ editFunction.onclick = function(e) {
               console.log(response.data.news_list[i]);
 
               div.innerHTML += `<tr>
-                                  <td class="text-left">`+response.data.news_list[i].id+`</td>
-                                  <td class="text-left"><a href="http://localhost:8002/news/get-post?header=`+response.data.news_list[i].header+`">`+response.data.news_list[i].header+`</a></td>                               
-                                  <td class="text-left">`+response.data.news_list[i].news+`</td>
-                                  <td class="text-left"><img src="./views/` + response.data.news_list[i].header + `/` + response.data.news_list[i].header + `.jpeg" alt=""></td>
-                                </tr>`;
+                                <td class="text-left">`+response.data.news_list[i].id+`</td>
+                                <td class="text-left"><a href="http://localhost/news/get-post?header=`+response.data.news_list[i].header+`">`+response.data.news_list[i].header+`</a></td>                               
+                                <td class="text-left">`+response.data.news_list[i].news+`</td>
+                                <td class="text-left"><img src="http:/`+`/localhost/` + response.data.news_list[i].header + `/` + response.data.news_list[i].header + `.jpeg" alt=""></td>
+                              </tr>`;
             }
           }
         })

@@ -15,7 +15,7 @@ func RegisterHTTPEndpoints(router *gin.Engine, uc auth.UseCase, pathToViews stri
 		authEndpoints.POST("/sign-in", h.SignIn)
 
 		// HTML
-		authEndpoints.GET("", h.AuthPage)
-		authEndpoints.Static("/static", pathToViews+"/auth/static")
+		//authEndpoints.GET("", h.AuthPage)
+		//authEndpoints.Static("/static", pathToViews+"/auth/static")
 	}
 }

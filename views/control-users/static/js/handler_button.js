@@ -4,7 +4,7 @@ const editFunction = document.getElementById("edit_button")
 const exitFunction = document.getElementById("return_to_main_menu")
 
 exitFunction.onclick = function(e) {
-  window.location.replace("http://localhost:8002/news");
+  window.location.replace("http://localhost/news");
   return false
 }
 
@@ -29,7 +29,7 @@ if (document.getElementById('Moderator').checked == true){
   const dataJSON = JSON.stringify(user);
 
   if (document.getElementById('create').checked == true) {
-    axios.post(`http://localhost:8001/control-users/add-user`, dataJSON, {timeout: 5000})
+    axios.post(`http://localhost/control-users/add-user`, dataJSON, {timeout: 5000})
     .then(function (response) {
       if (response.statusText == "OK") {
         message.innerHTML = "Пользователь добавлен!"
@@ -41,7 +41,7 @@ if (document.getElementById('Moderator').checked == true){
         document.getElementById('login').value = "";
         document.getElementById('pass').value = ""; 
 
-        axios.get("http://localhost:8001/control-users/get-all-users", {timeout: 5000})
+        axios.get("http://localhost/control-users/get-all-users", {timeout: 5000})
         .then(function (response) {
           if (response.statusText == "OK") {
             div = document.getElementById('tbody');
@@ -98,7 +98,7 @@ if (document.getElementById('Moderator').checked == true){
 
 
   }else if (document.getElementById('delete').checked == true) {
-    axios.post(`http://localhost:8001/control-users/delete-user`, dataJSON, {timeout: 5000})
+    axios.post(`http://localhost/control-users/delete-user`, dataJSON, {timeout: 5000})
     .then(function (response) {
       if (response.statusText == "OK") {
         message.innerHTML = "Пользователь удален!"
@@ -110,7 +110,7 @@ if (document.getElementById('Moderator').checked == true){
         document.getElementById('login').value = "";
         document.getElementById('pass').value = ""; 
 
-        axios.get("http://localhost:8001/control-users/get-all-users", {timeout: 5000})
+        axios.get("http://localhost/control-users/get-all-users", {timeout: 5000})
         .then(function (response) {
           if (response.statusText == "OK") {
             div = document.getElementById('tbody');
@@ -166,7 +166,7 @@ if (document.getElementById('Moderator').checked == true){
   }
  
   else if (document.getElementById('update').checked == true) {
-    axios.post(`http://localhost:8001/control-users/update-user-role`, dataJSON, {timeout: 5000})
+    axios.post(`http://localhost/control-users/update-user-role`, dataJSON, {timeout: 5000})
     .then(function (response) {
       if (response.statusText == "OK") {
         message.innerHTML = "Пользователь удален!"
@@ -178,7 +178,7 @@ if (document.getElementById('Moderator').checked == true){
         document.getElementById('login').value = "";
         document.getElementById('pass').value = ""; 
 
-        axios.get("http://localhost:8001/control-users/get-all-users", {timeout: 5000})
+        axios.get("http://localhost/control-users/get-all-users", {timeout: 5000})
         .then(function (response) {
           if (response.statusText == "OK") {
             div = document.getElementById('tbody');

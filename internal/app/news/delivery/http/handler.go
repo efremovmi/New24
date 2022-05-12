@@ -121,47 +121,6 @@ func (h *Handler) UpdateNewsForId(c *gin.Context) {
 	})
 }
 
-func (h *Handler) GetNewsHTMLForHeader(c *gin.Context) {
-	c.Header("Access-Control-Allow-Origin", "*")
-	header, ok := c.GetQuery("header")
-	if !ok {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"err": errorsCustom.BadRequest.Error()})
-		return
-	}
-
-	newsModel, statusCode, err := h.useCase.GetNewsHTMLForHeader(header)
-	if err != nil {
-		c.JSON(statusCode, gin.H{
-			"err": err.Error(),
-		})
-		return
-	}
-	splitPathToHTML := strings.Split(newsModel.PathToHTML, header+"/")
-	pathToHTML := ""
-	if len(splitPathToHTML) == 2 {
-		pathToHTML = header + "/" + splitPathToHTML[1]
-	}
-	c.HTML(http.StatusOK, pathToHTML, nil)
-}
-
-func (h *Handler) GetNewsByRoleHTML(c *gin.Context) {
-	c.Header("Access-Control-Allow-Origin", "*")
-	_, err := helpers.IsAdmin(c)
-	if err == nil {
-		c.HTML(http.StatusOK, "news/admin_news.html", nil)
-		return
-	}
-
-	err = helpers.IsModerator(c)
-	if err == nil {
-		c.HTML(http.StatusOK, "news/moder_news.html", nil)
-		return
-	}
-
-	c.HTML(http.StatusOK, "news/client_news.html", nil)
-}
-
 func (h *Handler) GetListPreviewNews(c *gin.Context) {
 	c.Header("Access-Control-Allow-Origin", "*")
 	var inp struct {
@@ -225,4 +184,45 @@ func (h *Handler) GetModeratorMenu(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "news/moder-menu/moder-menu.html", nil)
+}
+
+func (h *Handler) GetNewsHTMLForHeader(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
+	header, ok := c.GetQuery("header")
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err": errorsCustom.BadRequest.Error()})
+		return
+	}
+
+	newsModel, statusCode, err := h.useCase.GetNewsHTMLForHeader(header)
+	if err != nil {
+		c.JSON(statusCode, gin.H{
+			"err": err.Error(),
+		})
+		return
+	}
+	splitPathToHTML := strings.Split(newsModel.PathToHTML, header+"/")
+	pathToHTML := ""
+	if len(splitPathToHTML) == 2 {
+		pathToHTML = header + "/" + splitPathToHTML[1]
+	}
+	c.HTML(http.StatusOK, pathToHTML, nil)
+}
+
+func (h *Handler) GetNewsByRoleHTML(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
+	_, err := helpers.IsAdmin(c)
+	if err == nil {
+		c.HTML(http.StatusOK, "news/admin_news.html", nil)
+		return
+	}
+
+	err = helpers.IsModerator(c)
+	if err == nil {
+		c.HTML(http.StatusOK, "news/moder_news.html", nil)
+		return
+	}
+
+	c.HTML(http.StatusOK, "news/client_news.html", nil)
 }

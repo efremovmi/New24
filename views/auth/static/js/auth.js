@@ -21,7 +21,7 @@ myForm.onsubmit = function(e) {
       return false
     }
 
-    axios.post(`http://localhost:8000/auth/sign-up`, dataJSON, {timeout: 5000})
+    axios.post(`http://localhost/auth/sign-up`, dataJSON, {timeout: 5000})
     .then(function (response) {
       if (response.statusText == "OK") {
         message.innerHTML = "Вы успешно зарегестрировались!"
@@ -51,7 +51,7 @@ myForm.onsubmit = function(e) {
       }, timeOutMessage)
     });
   }else{
-    axios.post(`http://localhost:8000/auth/sign-in`, dataJSON, {timeout: 5000})
+    axios.post(`http://localhost/auth/sign-in`, dataJSON, {timeout: 5000})
     .then(function (response) {
       console.log(response.data.token)
       if (response.statusText == "OK") {
@@ -68,7 +68,7 @@ myForm.onsubmit = function(e) {
         document.getElementById('signup').checked = false;
         document.getElementById('signin').checked = true;
       }
-      window.location.replace("http://localhost:8002/news");
+      window.location.replace("http://localhost/news");
     })
     .catch(function (error) {
       if (typeof error.response === 'undefined'){

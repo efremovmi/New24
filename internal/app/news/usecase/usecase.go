@@ -62,7 +62,7 @@ func (n *NewsUseCase) saveFiles(image multipart.File, header, newsText string, i
 	templateHTML := fmt.Sprintf("<!DOCTYPE html>\n"+
 		"<html lang=\"en\">\n"+
 		"<head>\n"+
-		"  <title>News</title>\n"+
+		"  <title>Новость</title>\n"+
 		"  <meta charset=\"UTF-8\">\n"+
 		"  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"+
 		"\n"+
@@ -70,7 +70,7 @@ func (n *NewsUseCase) saveFiles(image multipart.File, header, newsText string, i
 		"\n"+
 		"\n"+
 		"\n"+
-		"  <link rel=\"stylesheet\" type=\"text/css\" href=./views/static/css/style.css>\n"+
+		"  <link rel=\"stylesheet\" type=\"text/css\" href=./static/css/one_news_style.css>\n"+
 		"\n"+
 		"\n"+
 		"</head>\n"+
@@ -86,13 +86,13 @@ func (n *NewsUseCase) saveFiles(image multipart.File, header, newsText string, i
 		"	 <div class=\"menu\">\n"+
 		"     <div class=\"menu_text\">#MY #YOUR #NEWS</div>\n"+
 		"      <button type=\"submit\">\n"+
-		"        Вернуться назад\n"+
+		"        Вернуться в меню\n"+
 		"      </button>\n"+
 		"    </div>"+
 		"  </form>\n"+
-		"<script src=\"./views/static/js/exit.js\"></script>\n"+
+		"<script src=\"./static/js/exit.js\"></script>\n"+
 		"</body>\n"+
-		"</html>\n", header, "./views/"+header+"/"+header+".jpeg", newsText)
+		"</html>\n", header, "http://localhost/"+header+"/"+header+".jpeg", newsText)
 
 	relPathToHTML := pathToNewNewsFolder + "/" + header + ".html"
 	fileHTMl, err := os.Create(relPathToHTML)
