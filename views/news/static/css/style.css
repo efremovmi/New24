@@ -142,7 +142,7 @@ input[type=radio] { display: none; }
 div.figure {
   background: #6ED0F6;
   float: right;
-  border: solid; black solid;
+  border: solid;
   margin: 0.0em;
   padding: 1.0em;
   text-align: center;

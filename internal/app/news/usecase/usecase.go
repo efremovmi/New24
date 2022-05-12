@@ -75,7 +75,7 @@ func (n *NewsUseCase) saveFiles(image multipart.File, header, newsText string, i
 		"\n"+
 		"</head>\n"+
 		"<body>\n"+
-		" <form action=\"\" method=\"post\" onsubmit=\"\" id=\"form\">\n"+
+		" <form method=\"post\" onsubmit=\"\" id=\"form\">\n"+
 		"    <div class=figure>\n"+
 		"      <p class=\"head\"> %s"+
 		"      <p><img class=scaled src=\"%s\"\n"+

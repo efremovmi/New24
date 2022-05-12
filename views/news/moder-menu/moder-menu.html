@@ -5,10 +5,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!--   <link rel="stylesheet" type="text/css" href=./control-users/static/css/table.css>
-  <link rel="stylesheet" type="text/css" href=./control-users/static/css/style.css>
-  <link rel="stylesheet" type="text/css" href=./control-users/static/css/radio-button.css>
- -->
   <link rel="stylesheet" type="text/css" href=./moder-menu/static/css/table.css>
   <link rel="stylesheet" type="text/css" href=./moder-menu/static/css/style.css>
   <link rel="stylesheet" type="text/css" href=./moder-menu/static/css/radio-button.css>
@@ -33,7 +29,7 @@
           </tr>
         </thead>
           <tbody class="table-hover" id="tbody">
-            <script type="text/javascript">
+            <script>
               axios.get("http://localhost/news/get-all-news", {timeout: 5000})
               .then(function (response) {
                 if (response.statusText == "OK") {
@@ -72,7 +68,7 @@
 
 
 
-      <form action="" method="post" onsubmit="" id="form">
+      <form method="post" onsubmit="" id="form">
 
        
         <input id="update" name="action" type="radio" value="update">

@@ -27,7 +27,7 @@
           </tr>
         </thead>
           <tbody class="table-hover" id="tbody">
-            <script type="text/javascript">
+            <script>
               axios.get("http://localhost/control-users/get-all-users", {timeout: 5000})
               .then(function (response) {
                 if (response.statusText == "OK") {
@@ -76,7 +76,7 @@
 
 
 
-      <form action="" method="post" onsubmit="" id="form">
+      <form method="post" onsubmit="" id="form">
 
         <input checked="" id="create" name="action" type="radio" value="create">
         <label for="create">Создать</label>
